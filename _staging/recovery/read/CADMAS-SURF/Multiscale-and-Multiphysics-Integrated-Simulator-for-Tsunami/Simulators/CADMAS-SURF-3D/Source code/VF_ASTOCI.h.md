@@ -1,0 +1,23 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D/Source code/VF_ASTOCI.h
+lines: 54
+sha256: 707b5a799866d830b662deae4ac06fbf25315f858fcb7b31da900212e6e58ea0
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# VF_ASTOCI.h — 판독 구간 기록
+
+구간은 1행부터 54행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–20 | STOC 연성(coupling)의 크기 상수·정수 배열과 COMMON을 선언한다. MAX_STOC와 MAX_CADMAS는 1024, MAX_NIST와 MAX_NJST는 2000, MAX_NKST는 500이다. 17–20행은 연속된 단일 COMMON 문장이다. 원문: `      INTEGER MAX_CADMAS` (1); `      INTEGER MAX_NIST,MAX_NJST,MAX_NKST` (2); `      PARAMETER ( MAX_STOC   = 1024 )` (4); `      PARAMETER ( MAX_CADMAS = 1024 )` (5); `      PARAMETER ( MAX_NIST = 2000 )` (6); `      PARAMETER ( MAX_NJST = 2000 )` (7); `      PARAMETER ( MAX_NKST = 500 )` (8); `      INTEGER NB_STOC,LB_STOC,IB_STOC(MAX_STOC)` (10); `      INTEGER NB_CADMAS,LB_CADMAS,IB_CADMAS(MAX_CADMAS)` (11); `      INTEGER NB_SC,ITAGSC` (12); `      INTEGER NIST,NJST,NKST,IWST,IEST,JSST,JNST` (13); `      INTEGER MIST(MAX_NIST+1),MJST(MAX_NJST+1),MKST(MAX_NKST+1)` (14); `      INTEGER IIST(4,MAX_STOC),JJST(4,MAX_STOC)` (15); `      COMMON /VF_ASTOCI/NB_STOC,LB_STOC,IB_STOC` (17); `     &                 ,NB_CADMAS,LB_CADMAS,IB_CADMAS,NB_SC,ITAGSC` (18); `     &                 ,NIST,NJST,NKST,IWST,IEST,JSST,JNST` (19); `     &                 ,MIST,MJST,MKST,IIST,JJST` (20). |
+| 21–43 | STOC와 CADMAS 간 프로세스(processing element, PE) 연결 수·순번·랭크·참여 플래그 설명이다. 원문: `CD=== 概要 ===========================================================` (22) (개요); `CDT   VF_ASTOCI.h:CADMAS-STOC連成関連:整数` (24) (CADMAS-STOC 연성 관련 정수); `C==== 内容 ===========================================================` (26) (내용); `CD    -- STOCとの通信に関する変数 --` (28) (STOC 통신 변수); `CD    NB_STOC          : CNS : I*4 : CADMASと接続しているSTOC-ICのPE数` (29) (CADMAS에 연결된 STOC-IC PE 수); `CD    LB_STOC          : CNS : I*4 : CADMASと接続しているSTOCのPEの順番付け` (30) (CADMAS에 연결된 STOC PE 순번); `CD                                   値は1〜NB_STOC(CADMASのPE及びCADMASと接続しないSTOCのPEでは0)` (31) (값은 1부터 NB_STOC, CADMAS PE와 비연결 STOC PE에서는 0); `CD                                   IB_STOC参照時に使用` (32) (IB_STOC 참조 시 사용); `CD    IB_STOC          : CNS : I*4 : CADMASと接続しているSTOCのPEの、comm_ic_mgにおけるSTOC-ICのランク` (33) (연결 STOC PE의 comm_ic_mg 내 STOC-IC 랭크); `CD       (NB_STOC)` (34); `CD    NB_CADMAS        : CNS : I*4 : STOC-ICと接続しているCADMASのPE数` (35) (STOC-IC에 연결된 CADMAS PE 수); `CD    LB_CADMAS        : CNS : I*4 : STOCと接続しているCADMASのPEの順番付け` (36) (STOC에 연결된 CADMAS PE 순번); `CD                                   値は1〜NB_CADMAS(STOCのPE及びSTOCと接続しないCADMASのPEでは0)` (37) (값은 1부터 NB_CADMAS, STOC PE와 비연결 CADMAS PE에서는 0); `CD                                   IB_CADMASやIB_SC参照時に使用` (38) (IB_CADMAS와 IB_SC 참조 시 사용); `CD    IB_CADMAS        : CNS : I*4 : STOCと接続しているCADMASのPEの、comm_ic_mgにおけるSTOC-ICのランク` (39) (연결 CADMAS PE의 comm_ic_mg 내 STOC-IC 랭크라는 원문 설명); `CD       (NB_CADMAS)` (40); `CD    NB_SC            : CNS : I*4 : STOC-CADMAS接続に参加しているか` (41) (STOC-CADMAS 연결 참여 여부); `CD                                      (=0:参加していない、>0:参加している）` (42) (0이면 불참, 양수면 참여). |
+| 44–54 | 격자 대응 관계와 서·동·남·북 경계 연결 플래그를 설명한다. 각 경계는 1이면 연결, 0이면 비연결이다. 원문: `CD    -- STOCとCADMASのメッシュの対応関係に関する変数 --` (44) (STOC와 CADMAS 격자 대응 관계 변수); `CD    NIST             : CNS : I*4 : 自領域をSTOC側のメッシュで分割した場合のX方向分割数` (45) (자기 영역을 STOC 격자로 나눌 때 X방향 분할 수); `CD    NJST             : CNS : I*4 : 自領域をSTOC側のメッシュで分割した場合のY方向分割数` (46) (자기 영역을 STOC 격자로 나눌 때 Y방향 분할 수); `CD    NKST             : CNS : I*4 : 自領域をSTOC側のメッシュで分割した場合のZ方向分割数` (47) (자기 영역을 STOC 격자로 나눌 때 Z방향 분할 수); `CD    MIST(NIST+1)     : CNS : I*4 : STOCのI番目の格子線位置が、CADMASの格子点インデックスのいくつに相当するか(X方向)` (48) (STOC I번째 X격자선에 해당하는 CADMAS 격자점 첨자); `CD    MJST(NJST+1)     : CNS : I*4 : STOCのJ番目の格子線位置が、CADMASの格子点インデックスのいくつに相当するか(Y方向)` (49) (STOC J번째 Y격자선에 해당하는 CADMAS 격자점 첨자); `CD    MKST(NKST+1)     : CNS : I*4 : STOCのK番目の格子線位置が、CADMASの格子点インデックスのいくつに相当するか(Z方向)` (50) (STOC K번째 Z격자선에 해당하는 CADMAS 격자점 첨자); `CD    IWST             : CNS : I*4 : 西側境界でSTOCと接続するか否か(=1：接続する、=0：接続しない)` (51) (서쪽 경계 STOC 연결 여부: 1 연결, 0 비연결); `CD    IEST             : CNS : I*4 : 東側境界でSTOCと接続するか否か(=1：接続する、=0：接続しない)` (52) (동쪽 경계 STOC 연결 여부: 1 연결, 0 비연결); `CD    JSST             : CNS : I*4 : 南側境界でSTOCと接続するか否か(=1：接続する、=0：接続しない)` (53) (남쪽 경계 STOC 연결 여부: 1 연결, 0 비연결); `CD    JNST             : CNS : I*4 : 北側境界でSTOCと接続するか否か(=1：接続する、=0：接続しない)` (54) (북쪽 경계 STOC 연결 여부: 1 연결, 0 비연결). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 1–8: MAX_STOC의 PARAMETER 값은 있으나 이 파일의 명시적 INTEGER 선언에는 MAX_STOC가 없다.
+- 38·1–20: 주석은 IB_SC 참조를 언급하지만 이 헤더의 선언·COMMON에는 IB_SC가 없다.
+- 39: IB_CADMAS 설명도 “STOC-ICのランク”로 표기한다.

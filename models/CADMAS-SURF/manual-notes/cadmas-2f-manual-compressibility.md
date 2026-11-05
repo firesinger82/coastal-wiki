@@ -1,13 +1,14 @@
 ---
-title: "CADMAS-2F 영문 매뉴얼 — 기상 압축성 부록 (EOS·준압축성 Poisson 소스 cross-confirm, /3D 매뉴얼 95% 중복)"
+title: "CADMAS-2F 영문 매뉴얼 — 기상 압축성 (EOS·준압축성 Poisson 대조)" # [11-04 대조 정정]
 model: CADMAS-SURF
 component: manual-notes
 canonical_source: self
-verification_method: "CADMAS-2F_Manural_English.pdf(160p, 인쇄 p.463-622) pdftotext 추출. Table 0-1-1(p.467-468)·연속식 eq(2.1) 압축성항(p.471)·EOS eq(2.38)(p.485)·Dρ/Dt eq(2.39)(p.486)·압력선형화 Poisson eq(3.127-3.128)(p.522-523)·입력 OPTION STATE(p.603)/MATE 2열 RHO0(p.585)·참고문헌 CDIT Library(12)(p.621). 소스 cross-confirm: user_eos.f·vf_v1eos.f·vf_vpdrdt.f(EOS·Dρ/Dt·Poisson 계수 정확일치). printed page 직접 인용."
+verification_method: "CADMAS-2F_Manural_English.pdf(160p, 인쇄 p.463-622) pdftotext 추출. EOS 식 (2.38)·밀도 미분 식 (2.39)은 PDF p.24(인쇄 p.486). 압력 선형화 식 (3.127)·(3.128)은 PDF p.61(인쇄 p.523). OPTION STATE는 PDF p.142(인쇄 p.604). 기체 밀도 열은 PDF p.124(인쇄 p.586). 2026-11-04 CADMAS-SURF recovery 대조 보고서 반영. 정규화 저장·이류 계수·이웃 계수·표면 밀도 복사 방향을 구분. KF1·KF2·KF3 최종 근거와 본문 인용을 연결." # [11-04 대조 정정]
 citation_status: verified
 has_source_needed: false
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-24
+last_source_check: "2026-11-04 (recovery 대조 반영)"
 related:
   - models/CADMAS-SURF/source-analysis/cadmas-2f-twophase-compressible-gas.md
   - models/CADMAS-SURF/manual-notes/cadmas-surf3d-english-manual-governing-equations.md
@@ -15,7 +16,11 @@ related:
 
 # CADMAS-2F 영문 매뉴얼 — 기상 압축성
 
-> 번들 `Simulators/CADMAS-SURF-3D2F/Manual/CADMAS-2F_Manural_English.pdf`(160p, 인쇄 p.463-622, "CADMAS-SURF 3D-2F"). **/3D 매뉴얼의 ~95% 중복** + **기상 압축성 부록**(§2.10·§3.3.12·Overview (1)(b)). [소스 2상 노트](../source-analysis/cadmas-2f-twophase-compressible-gas.md)와 식 단위 cross-confirm.
+> 원문은 번들 `Simulators/CADMAS-SURF-3D2F/Manual/CADMAS-2F_Manural_English.pdf`(160p, 인쇄 p.463–622)이다. [11-04 대조 정정]
+
+PDF p.1–60에는 3D 매뉴얼과 공통인 식이 있다. 압축항·미사용 표시·일부 편집 오류가 다르다. 식별 대응은 [2f-theory 보고서 §2](../../../_staging/recovery/compare/cadmas-2f-manual-theory-vs-code.md#2-대조-표)에 있다. [11-04 대조 정정]
+
+이 노트의 정정 문장은 AI가 작성한 대조 해석이다. 백틱 인용은 문서·코드 원문이다.
 
 ## 1. 동기 (p.463-464)
 
@@ -23,34 +28,82 @@ related:
 
 ## 2. 기상 압축성 식 (cross-confirm)
 
-별도 운동량집합이 아니라 단상 porous-VOF에 **기상 압축성 소스항 `(1-F)/ρ_G·Dρ_G/Dt`** 1개를 연속식·Poisson에 주입:
+문서는 연속식과 운동량·스칼라 수송식에 기상밀도 변화항을 기술한다 (`2F manual p.9·17–18`). 현재 코드의 운동량 항은 문서와 부호가 다르다. 스칼라 갱신에는 그 항이 없다. 근거는 [KF1-025·026·027·042·050·053](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md)이다. [11-04 대조 정정]
 
-- **연속식 eq(2.1)(p.471)**: `∂ₓ(γₓu)+∂_y(γ_yv)+∂_z(γ_zw) = γ_vS_φ − (1−F)/ρ_G·ρ̇_G`
+- **연속식 (2.1)**의 조파 소스 기호는 `S_ρ`이다 (`2F manual p.9`, 인쇄 p.471). 3D2F의 조파 소스는 비활성이다. 근거는 [2f-theory §4](../../../_staging/recovery/compare/cadmas-2f-manual-theory-vs-code.md#4-노트-대조와-수정안)와 [KF1-034·037](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md)이다. [11-04 대조 정정]
 - **VOF-F eq(2.7)(p.472-473)**: 불변. 매뉴얼 명시 *"F 는 비압축 유체상의 이류만; 기상 압축효과는 이 식에 안 나타남. 기상 체적변화 = F이류식과 연속식의 차"* — 결합의 개념적 핵심
-- **EOS eq(2.38)(p.485)**: `ρ_G = ρ_G(p)` "user function 으로 주어짐"
-- **Dρ_G/Dt eq(2.39)(p.486)**: `ρ̇_G = γ_v∂ρ_G/∂t + ∂ₓ(γₓuρ_G)+...`
-- **압력선형화 Poisson eq(3.128)(p.522-523)**: `ρ_G^{n+1}=ρ_Gi+(dρ_G/dP)·(P^{n+1}−P^{(i)})`, SMAC 내부반복 `(i)` + 완화계수 RELAX (SIMPLE형)
-- **EOS 등온이상기체**(operation default): 입력 `OPTION STATE`(p.603) `ISTATE=1`+PARAM1=p₀·PARAM2=R·PARAM3=T → ρ_G=(p+p₀)/RT. `ISTATE=0`=비압축
+- **EOS 식 (2.38)**은 `2F manual p.24`(인쇄 p.486)에 있다. 문서는 상태방정식을 사용자 함수로 준다. 원문은 [2f-theory의 KF1-055](../../../_staging/recovery/compare/cadmas-2f-manual-theory-vs-code.md#2-대조-표)에 있다. [11-04 대조 정정]
+- **밀도 미분 식 (2.39)**은 `\dot\rho_G=\gamma_v\frac{\partial\rho_G}{\partial t}+\gamma_xu\frac{\partial\rho_G}{\partial x}+\gamma_yv\frac{\partial\rho_G}{\partial y}+\gamma_zw\frac{\partial\rho_G}{\partial z}`이다 (`2F manual p.24`, 인쇄 p.486). 원문은 [2f-theory의 KF1-056](../../../_staging/recovery/compare/cadmas-2f-manual-theory-vs-code.md#2-대조-표)에 있다. [11-04 대조 정정]
+- **압력 선형화 식 (3.127)·(3.128)**은 `2F manual p.61`(인쇄 p.523)에 있다. EOS의 LL 반복 안에서는 TNOW를 증가시키지 않는다 (`3D2F/vf_a1main.f:1190,1347–1386`). 근거는 [2f-program의 KF2-005](../../../_staging/recovery/compare/cadmas-2f-manual-program-vs-code.md#2-대조-표)와 [KF2-027](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md)이다. [11-04 대조 정정]
+- **기본 `ISTATE=0`은 비압축 기체다.** `OPTION STATE 1`을 지정하면 등온 상태방정식을 사용한다 (`3D2F/vf_a2dflt.f:47`, `3D2F/vf_v1eos.f:63–74`). `OPTION STATE`는 `2F manual p.142`(인쇄 p.604)에 있다. 근거는 [KF3-190·191](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF3.md)이다. [11-04 대조 정정]
+- 기본 매개변수의 세 대입은 `SPARAM(1) =1.0D5`, `SPARAM(2) =8.31451D0/0.029D0`, `SPARAM(3) =300.`이다 (`3D2F/vf_a2dflt.f:70–72`). 근거는 [KF2-343](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md)이다. [11-04 대조 정정]
 
-### 매뉴얼 ↔ 소스 대조
+### 매뉴얼과 소스 대조 [11-04 대조 정정]
 
-| 식 | 매뉴얼(p) | 소스 | 판정 |
-|---|---|---|---|
-| EOS ρ=ρ(p) 등온이상기체 | (2.38) p.485·STATE p.603 | `user_eos.f` `RHOG=(PP+P0)/(RCONS·TCONS)`·`DRHODP=1/(PP+P0)` | ✅ 정확일치 |
-| Dρ/Dt 필드 | (2.39) p.486·(3.127) p.522 | `vf_v1eos.f` `DRHODT=(1−F)(dρ/dt)/ρ` 동일 upwind | ✅ 일치 |
-| Poisson 압축성 계수 | (3.128) p.523 | `vf_vpdrdt.f` `AD+=AVLT·DRHODP`·`BB+=AVL·DRHODT` | ✅ 정확일치(행렬계수+RHS) |
-| 밀도혼합 ρ=F·ρ_L+(1-F)·ρ_G | **부재** | 2열 RHO0(sharp VOF) | ⚠ 매뉴얼은 sharp-interface, 혼합밀도식 없음 |
+DRHODP는 기상밀도로 나눈 압력미분이다. DRHODT는 코드의 밀도 시간변화·이류 합을 기상밀도로 나눈 값이다. 이 저장식에는 `1−F`가 없다. `1−F`는 소비 위치에서 곱한다 (`3D2F/vf_v1eos.f:168–172`, `3D2F/vf_vpdrdt.f:95`, `3D2F/vf_veuler.f:143–145`, `3D2F/user_eos.f:33–34`). 근거는 [KF1-203](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md)이다. [11-04 대조 정정]
 
-> **net**: EOS·Dρ/Dt·Poisson 결합은 매뉴얼↔소스 **정확일치**. 단 "혼합밀도"식은 매뉴얼에 없음 — 모델은 sharp VOF + 2열 RHO0(액=1열·기=2열, 기본 1.0, p.585).
+밀도 이류의 `GV = GGV(I,J,K)/GLV(I,J,K)` 추가 인자는 중간 강도의 코드 결함 후보이다. GGV와 GLV가 다르고 밀도 이류항이 0이 아닐 때 문서 식과 차이가 난다. `ISTATE=0`이면 이 계산 전에 반환한다 (`3D2F/vf_v1eos.f:118–172`, `3D2F/vf_vpdrdt.f:98–104`, `3D2F/vf_vpcoef.f:421–423`, `2F manual p.61` 식 (3.127)). 근거는 [KF2-003](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md)이다. [11-04 대조 정정]
 
-## 3. 적발 — sf_* 구조결합이 매뉴얼에 부재
+압축성 증강 행렬이 존재한다. 대각 시간항의 원문은 `AD(I,J,K) = AD(I,J,K) + AVLT*DRHODP(I,J,K)/DTNOW`이다 (`3D2F/vf_vpdrdt.f:154`, `2F manual p.61` 식 (3.128)). 원문은 [2f-program의 KF2-005](../../../_staging/recovery/compare/cadmas-2f-manual-program-vs-code.md#2-대조-표)에 있다. [11-04 대조 정정]
 
-매뉴얼은 구조물을 **고정 porous body**로만 기술(γ_v·C_D·C_M, eq 2.5-2.6 p.471-472), p.608 *"구조물 위치변경 불가(프로그램 미확인)"* 명시. cut-cell/tetrahedron/FSI/可動床/変形 전문검색 = **0 hit**. → [`sf_*` cut-cell FSI 엔진](../source-analysis/cadmas-2f-structure-coupling-cutcell.md)은 **소스에만 존재, 매뉴얼 부재**(매뉴얼이 해당 기능보다 앞서거나 누락). 문서화 갭으로 기록.
+AUI의 `AUI(I,J,K) = AUI(I,J,K) + DCOEF*DRHODP(I-1,J,K)`는 강한 첨자 결함 후보다. AUI는 I+1 미지수의 계수다. 실제 차이는 WUC가 음수이고 DCOEF가 0이 아니며 I-1과 I+1의 DRHODP가 다를 때 생긴다. 해당 분기는 `IF(ISTATE.EQ.0) RETURN`을 통과한 현재 압력 계산 경로에 있다 (`3D2F/vf_vpdrdt.f:77,93–150`, `3D2F/vf_v1cal.f:357–372`, `3D2F/vf_mzax.f:46–52`). 근거는 [KF2-359](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md)이다. [11-04 대조 정정]
 
-## 4. /3D 매뉴얼 대비 신규분 (얇음)
+표면 셀의 기상 밀도·압력 미분 복사 방향은 중간 강도의 코드 결함 후보다. `IF     (NF(I,J,K).EQ.1) THEN`에서 실제 대입은 `RHOG(I,J,K)   = RHOG  (I-1,J,K)`와 `DRHODP(I,J,K) = DRHODP(I-1,J,K)`다. `NF=1`의 I-1은 액체 방향이다. 다른 다섯 방향도 액체 방향에서 복사한다. 액체 셀에도 EOS를 계산하므로 복사 원점은 계산된 값이다. `IF(ISTATE.EQ.0) RETURN`이면 이 복사에 도달하지 않는다 (`3D2F/vf_v1eos.f:63–105`, `3D2F/vf_fnfprv.f:162–189`, `3D2F/vf_cindc.f:39–49`, `3D2F/vf_a1main.f:977,1351,1363–1364`, `2F manual p.61,106`). 근거는 [KF2-360](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md)이다. [11-04 대조 정정]
 
-2상 고유 추가 = §2.10(압축성, eq 2.38-2.39, p.485-486) + §3.3.12(Poisson 선형화, eq 3.127-3.128, p.522-523) + Overview(1)(b)(p.463-464) + 입력키워드(OPTION STATE·DENS_ERROR·MATE 2열 RHO0·배열 RHOG/RHOGO/DRHODP/DRHODT). 그 외 Ch2 분석모델·Ch3 이산화·VOF·k-ε·SMAC·조파·무반사는 [/3D 매뉴얼](cadmas-surf3d-english-manual-governing-equations.md)과 동일(인쇄페이지 463-622 = 더 큰 CDIT 문서의 연속 섹션).
+밀도 초기 기본값은 액체 1000 kg/m³와 기체 1 kg/m³다. `MATE DENSITY`에 한 값만 지정하면 `RHO0(2)=RHO0(1)`을 적용한다. `MATE K-VISC`도 한 값만 지정하면 `ANU0(2)=ANU0(1)`을 적용한다 (`3D2F/vf_a2dflt.f:170–173`, `3D2F/vf_iimate.f:41–47,55–61`). 기체 밀도 열과 기체 기본 밀도는 `2F manual p.124`(인쇄 p.586)에 있다. 근거는 [KF3-190·193](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF3.md)이다. EOS 기상밀도는 압력에 따라 달라진다. 근거는 [2f-theory §4의 밀도 기본값 수정안](../../../_staging/recovery/compare/cadmas-2f-manual-theory-vs-code.md#4-노트-대조와-수정안)이다. [11-04 대조 정정]
+
+## 3. 구조물 설명과 재시작 조건 [11-04 대조 정정]
+
+PDF p.1–60의 다공성 이론식은 정지 공극률을 전제로 설명한다 (`2F manual p.9–10·15–16`). 공극률 시간변화 소스에는 `QU(I,J,K)=QU(I,J,K)+(GV1-GV)*DTI*U`가 있다 (`3D2F/vf_vgene.f:129–130`). 근거는 [KF1-210](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md)이다. [11-04 대조 정정]
+
+구조물 위치와 경계조건 변경 금지는 재시작 조건이다. 해당 위치는 `2F manual p.135`(인쇄 p.597)이다. 매뉴얼은 `2F manual p.155–156`에서 시간 공극률 입력을 설명한다. 재시작 제한만으로 일반 계산의 이동구조물 지원 여부를 판정하지 않는다 (`3D2F/vf_ir1inp.f:131–133`). 근거는 [KF3-194](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF3.md)이다. [11-04 대조 정정]
+
+구조 결합 코드는 [`sf_*` 구조 결합 노트](../source-analysis/cadmas-2f-structure-coupling-cutcell.md)에 정리되어 있다.
+
+## 4. 입력 키워드와 변수 선언 [11-04 대조 정정]
+
+밀도 수렴 입력은 `OPTION DENS-ERROR [ERROR] [MAXITER] [RELAX]`다 (`3D2F/vf_iiopt.f:89–101`, `3D2F/A11111.in:707`). 근거는 [KF3-192](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF3.md)와 [KU1-951](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KU1.md)이다. [11-04 대조 정정]
+
+코드 입력 키워드는 `DENS-ERROR`이다. 밑줄 표기 `DENS_ERROR`를 코드 키워드로 쓰지 않는다 (`3D2F/vf_iiopt.f:89–101`, `3D2F/A11111.in:705–712`, `2F manual p.142`, 인쇄 p.604). 근거는 [KD1-911](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KD1f.md)이다. [11-04 대조 정정]
+
+밀도 최대 반복 횟수의 실제 변수명은 `MAXITR`이다 (`3D2F/VF_ACOMPI.h:4,40`, `3D2F/vf_a1main.f:1347`). 문서 표는 `MAXITER`로 적는다 (`2F manual p.82`). 근거는 [KF2-097](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md)이다. [11-04 대조 정정]
+
+SPARAM의 실제 크기는 `MAXWDS-3`이다. 현재 상수로 125개다. 문서의 `SPARAM(10)`은 현재 입력 저장 용량을 모두 설명하지 않는다 (`3D2F/VF_ACOMPR.h:5`, `3D2F/VF_A0PRM.h:10`, `3D2F/vf_a2dflt.f:69–72`, `3D2F/vf_iiopt.f:81–87`, `2F manual p.83`). 근거는 [KF2-114](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md)이다. [11-04 대조 정정]
+
+공통식의 번호별 대응과 차이는 [2f-theory 보고서 §2](../../../_staging/recovery/compare/cadmas-2f-manual-theory-vs-code.md#2-대조-표)에 있다. [11-04 대조 정정]
+
+문서와 코드 차이 표는 [cadmas-2f-manual-differences.md](cadmas-2f-manual-differences.md)에 있다.
 
 ## 5. 참고문헌 (Ch6, p.621-622)
 
 CDIT(2001) "Research and development of numerical wave channel" **CDIT Library (12)** · Sakakiyama-Abe-Kajima(1990, porous) · Hirt-Nichols(1981, VOF) · Torrey et al.(1987, **NASA-VOF3D** LA-11009-MS) · Isobe-Nishimura-Horikawa(1978) · Dean(1965, stream-function) · Gueyffier et al.(1999) · Fujino(1991, BiCGSTAB) 외.
+
+## 문서와 코드 차이 (11-04 대조)
+
+비교한 판: 코드는 github.com/CADMAS-SURF/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami `da7668f`(2024-08-30, 커밋 1개)의 Simulators/이며, 문서는 `CADMAS-2F_Manural_English.pdf`와 3D2F의 입력 지침 `A11111.in`이다.
+
+결론 문장은 AI 대조 해석이다. 백틱은 문서·코드 원문이다. 코드 약칭은 해당 시뮬레이터의 Source code/를 기준으로 한다.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| 2f-input:KF3-190 | 노트 쪽 번호 | `입력 OPTION STATE(p.603)/MATE 2열 RHO0(p.585)`<br>`OPTION STATE`<br>`기본 1.0, p.585` | `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-2f-manual-compressibility.md:6,33,39,44`; 2F manual p.124,142(586,604) | B 문서 오기 | OPTION STATE는 PDF p.142, 인쇄 604쪽에 있다. 기체 밀도 열과 기체 기본 밀도는 PDF p.124, 인쇄 586쪽에 있다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF3.md) |
+| 2f-input:KF3-191 | 노트 기본 EOS | `OPTION STATE`<br>`ISTATE=1`<br>`ISTATE=0` | `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-2f-manual-compressibility.md:33`; 2F manual p.142(604); `3D2F/vf_a2dflt.f:47`; `3D2F/vf_v1eos.f:63–74`<br>`ISTATE=0`<br>`IF(ISTATE.EQ.0) RETURN` | B 문서 오기 | 기본 `ISTATE=0`은 비압축 기체다. `OPTION STATE 1`을 지정하면 등온 상태방정식을 사용한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF3.md) |
+| 2f-input:KF3-192 | 노트 DENS_ERROR | `2상 고유 추가 = §2.10(압축성, eq 2.38-2.39, p.485-486) + §3.3.12(Poisson 선형화, eq 3.127-3.128, p.522-523) + Overview(1)(b)(p.463-464) + 입력키워드(OPTION STATE·DENS_ERROR·MATE 2열 RHO0·배열 RHOG/RHOGO/DRHODP/DRHODT). 그 외 Ch2 분석모델·Ch3 이산화·VOF·k-ε·SMAC·조파·무반사는 [/3D 매뉴얼](cadmas-surf3d-english-manual-governing-equations.md)과 동일(인쇄페이지 463-622 = 더 큰 CDIT 문서의 연속 섹션).` | `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-2f-manual-compressibility.md:52`; 2F manual p.142(604); `3D2F/vf_iiopt.f:89–101`; `3D2F/A11111.in:707`<br>`ELSEIF (TEXT(IS(2):IE(2)).EQ.'DENS-ERROR') THEN`<br>`OPTION DENS-ERROR [ERROR] [MAXITER] [RELAX]` | B 문서 오기 | 밀도 수렴 입력은 `OPTION DENS-ERROR [ERROR] [MAXITER] [RELAX]`다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF3.md) |
+| 2f-input:KF3-193 | 노트 기체 기본값 조건 | `> **net**: EOS·Dρ/Dt·Poisson 결합은 매뉴얼↔소스 **정확일치**. 단 "혼합밀도"식은 매뉴얼에 없음 — 모델은 sharp VOF + 2열 RHO0(액=1열·기=2열, 기본 1.0, p.585).` | `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-2f-manual-compressibility.md:44`; 2F manual p.124(586); `3D2F/vf_a2dflt.f:170–173`; `3D2F/vf_iimate.f:41–47,55–61`<br>`RHO0(2)=RHO0(1)`<br>`ANU0(2)=ANU0(1)`<br>`IF (NWD.LT.4) THEN` | C 문서 누락 | 밀도 초기 기본값은 액체 1000 kg/m³와 기체 1 kg/m³다. `MATE DENSITY`에 한 값만 지정하면 `RHO0(2)=RHO0(1)`을 적용한다. `MATE K-VISC`도 한 값만 지정하면 `ANU0(2)=ANU0(1)`을 적용한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF3.md) |
+| 2f-input:KF3-194 | 재시작 제한 오해 | `sf_*` | `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-2f-manual-compressibility.md:48`; 2F manual p.135,155–156(597,617–618); `3D2F/vf_ir1inp.f:131–133`<br>`CMVO  IF (NUMB.NE.I4) /* 移動構造物のための変更 */` | B 문서 오기 | 구조물 위치와 경계조건 변경 금지는 재시작 조건이다. 해당 위치는 PDF p.135, 인쇄 597쪽이다. 매뉴얼은 PDF pp.155–156에서 시간 공극률 입력을 설명한다. 재시작 제한만으로 일반 계산의 이동구조물 지원 여부를 판정하지 않는다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF3.md) |
+| 2f-program:KF2-097 | p.82 MAXITER | `MAXITER`<br>`CNS`<br>`I*4`<br>`Maximum number of iterations` | `3D2F/VF_ACOMPI.h:4,40`; `3D2F/vf_a1main.f:1347`; 2F manual p.82; JP p.72<br>`&                  ,ISTATE,MAXITR`<br>`CD    MAXITR : CNS : I*4 : 密度収束計算における最大反復回数` | B 문서 오기 | 밀도 최대 반복 횟수의 실제 변수명은 MAXITR이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md) |
+| 2f-program:KF2-114 | p.83 SPARAM(10) | `SPARAM(10)`<br>`CNS`<br>`R*8`<br>`Parameters for state equation` | `3D2F/VF_ACOMPR.h:5`; `3D2F/VF_A0PRM.h:10`; `3D2F/vf_a2dflt.f:69–72`; `3D2F/vf_iiopt.f:81–87`; 2F manual p.83; JP p.73<br>`&                  ,SPARAM(MAXWDS-3),SERROR,SRELAX`<br>`CD    SPARAM : CNS : R*8 : 圧縮効果を現す状態方程式のパラメータ`<br>`CD                         ISTATE=1のとき`<br>`CD                              (p+p0)=ρRT`<br>`CD                         で` | C 문서 누락 | SPARAM의 실제 크기는 MAXWDS-3이다. 현재 상수로 125개다. 문서의 SPARAM(10)은 현재 입력 저장 용량을 모두 설명하지 않는다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md) |
+| 2f-program:KF2-343 | p.82–83에 없는 EOS 입력 형식·기본값·검사 | (문서에 해당 문장 없음) | `3D2F/vf_iiopt.f:81–101`; `3D2F/vf_a2dflt.f:47–48,69–74`; 2F manual p.82–83<br>`IF (ISTATE.GT.1) CALL VF_A2ERR('VF_IIOPT','INVALID VALUE.')`<br>`IF (NWD.GE.4) THEN`<br>`IF (NWD.GE.5) THEN`<br>`IF (SERROR.LE.ZERO) CALL VF_A2ERR('VF_IIOPT','INVALID VALUE.')`<br>`IF (MAXITR.LE.0) CALL VF_A2ERR('VF_IIOPT','INVALID VALUE.')`<br>`IF (SRELAX.LT.ZERO) CALL VF_A2ERR('VF_IIOPT','INVALID VALUE.')`<br>`SPARAM(1) =1.0D5`<br>`SPARAM(2) =8.31451D0/0.029D0`<br>`SPARAM(3) =300.`<br>`ELSEIF (TEXT(IS(2):IE(2)).EQ.'STATE') THEN`<br>`IF (NWD.LT.3) CALL VF_A2ERR('VF_IIOPT','SYNTAX ERROR.')`<br>`CALL VF_ZSTOI(ISTATE,TEXT(IS(3):IE(3)))`<br>`DO I=4,NWD` | C 문서 누락 | OPTION STATE는 ISTATE와 뒤따르는 SPARAM 값을 읽는다. ISTATE의 값 검사는 `IF (ISTATE.GT.1) CALL VF_A2ERR('VF_IIOPT','INVALID VALUE.')`다. OPTION DENS-ERROR는 SERROR를 읽는다. `IF (NWD.GE.4) THEN`에서 MAXITR를 읽는다. `IF (NWD.GE.5) THEN`에서 SRELAX를 읽는다. 값 검사는 각각 `IF (SERROR.LE.ZERO) CALL VF_A2ERR('VF_IIOPT','INVALID VALUE.')`, `IF (MAXITR.LE.0) CALL VF_A2ERR('VF_IIOPT','INVALID VALUE.')`, `IF (SRELAX.LT.ZERO) CALL VF_A2ERR('VF_IIOPT','INVALID VALUE.')`다. 기본 `ISTATE=0`·`MAXITR=1`·`SERROR=1.0D-4`·`SRELAX=1.0D0`이다. SPARAM의 기본 세 대입은 `SPARAM(1) =1.0D5`, `SPARAM(2) =8.31451D0/0.029D0`, `SPARAM(3) =300.`이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md) |
+| 2f-program:KF2-359 | p.61 압력 선형화의 x 양의 이웃 계수 | `(3.127)`<br>`(3.128)` | `3D2F/vf_vpdrdt.f:77,93–150`; `3D2F/vf_v1eos.f:126–138`; `3D2F/vf_vpsol.f:30`; `3D2F/vf_mzax.f:46–52`; `3D2F/vf_v1cal.f:357–372`; 2F manual p.61 식 (3.127)–(3.128)<br>`AUI(I,J,K) = AUI(I,J,K) + DCOEF*DRHODP(I-1,J,K)`<br>`IF(ISTATE.EQ.0) RETURN`<br>`IF(NF(I,J,K).GT.0) THEN`<br>`IF(WUC.GT.0.0D0) THEN`<br>`IF(NF(I+1,J,K).GT.0) THEN`<br>`C                 DRHODX = (RHOG(I+1,J,K) - RHOG(I,J,K))*XX(5,I+1)`<br>`DCOEF = AVLT*WUC*XX(5,I+1)`<br>`AD (I,J,K) = AD (I,J,K) - DCOEF*DRHODP(I  ,J,K)` | E 코드 결함 후보 (강함) | AUI의 `AUI(I,J,K) = AUI(I,J,K) + DCOEF*DRHODP(I-1,J,K)`는 강한 첨자 결함 후보다. AUI는 I+1 미지수의 계수다. `IF(ISTATE.EQ.0) RETURN`을 통과한 뒤 `IF(NF(I,J,K).GT.0) THEN` 내부에서 `IF(WUC.GT.0.0D0) THEN`의 ELSE와 `IF(NF(I+1,J,K).GT.0) THEN`을 거쳐 실행된다. 실제 차이는 WUC가 음수이고 DCOEF가 0이 아니며 I-1과 I+1의 DRHODP가 다를 때 생긴다. 자기 차분 주석·y/z 경로·별도 EOS 차분·행렬 곱은 I+1을 지지한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF2.md) |
+| 2f-theory:KF1-019 | 3D 자유수면 속도 처리 잔존 | (문서 기능표·표면 속도 경계조건 설명; 2F manual p.6·21–22) | 2F manual p.6·21–22; diff: `3D/vf_v1cal.f:293–295` / `3D2F/vf_v1cal.f:390–392`<br>`C2F   CALL VF_BSUWT (XX,YY,ZZ,UU,VV,WW,DBUF,NF,INDX,INDY,INDZ)`<br>`C2F   CALL VF_BSUWT2(UU,VV,WW,DBUF,NF,INDX,INDY,INDZ,INDS)`<br>`C2F   CALL VF_BSUWN (XX,YY,ZZ,UU,VV,WW,GGX,GGY,GGZ,DBUF,NF,INDS)` | A 판 차이 | 3D의 자유수면 속도 외삽 설명을 현재 2F 실행 경로로 적용하지 않는다. 판 근거는 `3D/vf_v1cal.f:293–295`의 활성 호출과 `3D2F/vf_v1cal.f:390–392`의 C2F 주석 호출의 사본 차이이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-025 | x 운동량 압축항 부호 | `-u\frac{1-F}{\rho_G}\dot{\rho}_G` | 2F manual p.9 식 (2.1)–(2.2); `3D2F/vf_veuler.f:138–152`; `3D2F/vf_v1eos.f:168–172`; `3D2F/vf_vpdrdt.f:77–95`<br>`UU(I,J,K)=(GV*UUO(I,J,K)+DTNOW*(DU+DRDTU))/GV0`<br>`DRDTU=XX(6,I)*(XX(2,I  )*DRHODT(I  ,J,K)`<br>`&                      +XX(2,I-1)*DRHODT(I-1,J,K))`<br>`&                     *(1.0D0 - FX(I,J,K))*UU(I,J,K)` | E 코드 결함 후보 (중간) | x 운동량의 압축항 부호는 중간 강도의 코드 결함 후보이다. 코드는 `UU(I,J,K)=(GV*UUO(I,J,K)+DTNOW*(DU+DRDTU))/GV0`로 더한다. 문서 식 (2.2)는 `−u(1−F)ρ̇G/ρG`를 쓴다. `ISTATE=0` 또는 해당 면의 `FX=1`이면 이 추가 항은 0이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-026 | y 운동량 압축항 부호 | `-v\frac{1-F}{\rho_G}\dot{\rho}_G` | 2F manual p.9 식 (2.1)·(2.3); `3D2F/vf_veuler.f:204–218`; `3D2F/vf_vpdrdt.f:79`<br>`VV(I,J,K)=(GV*VVO(I,J,K)+DTNOW*(DV+DRDTV))/GV0`<br>`DRDTV=YY(6,J)*(YY(2,J  )*DRHODT(I,J  ,K)`<br>`&                      +YY(2,J-1)*DRHODT(I,J-1,K))`<br>`&                     *(1.0D0 - FY(I,J,K))*VV(I,J,K)` | E 코드 결함 후보 (중간) | y 운동량의 압축항 부호는 중간 강도의 코드 결함 후보이다. 코드는 `VV(I,J,K)=(GV*VVO(I,J,K)+DTNOW*(DV+DRDTV))/GV0`로 더한다. 문서 식 (2.3)는 `−v(1−F)ρ̇G/ρG`를 쓴다. `ISTATE=0` 또는 해당 면의 `FY=1`이면 이 추가 항은 0이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-027 | z 운동량 압축항 부호 | `-w\frac{1-F}{\rho_G}\dot{\rho}_G` | 2F manual p.9 식 (2.1)·(2.4); `3D2F/vf_veuler.f:270–284`; `3D2F/vf_vpdrdt.f:79`<br>`WW(I,J,K)=(GV*WWO(I,J,K)+DTNOW*(DW+DRDTW))/GV0`<br>`DRDTW=ZZ(6,K)*(ZZ(2,K  )*DRHODT(I,J,K  )`<br>`&                      +ZZ(2,K-1)*DRHODT(I,J,K-1))`<br>`&                     *(1.0D0 - FZ(I,J,K))*WW(I,J,K)` | E 코드 결함 후보 (중간) | z 운동량의 압축항 부호는 중간 강도의 코드 결함 후보이다. 코드는 `WW(I,J,K)=(GV*WWO(I,J,K)+DTNOW*(DW+DRDTW))/GV0`로 더한다. 문서 식 (2.4)는 `−w(1−F)ρ̇G/ρG`를 쓴다. `ISTATE=0` 또는 해당 면의 `FZ=1`이면 이 추가 항은 0이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-029 | 실질미분의 점 누락 | `and`<br>`\rho_G` | 2F manual p.9·10·24; `3D2F/vf_v1eos.f:170–172`<br>`DRHODT(I,J,K) =`<br>`&         (  GGV(I,J,K)*(RHOG(I,J,K) - RHOGO(I,J,K))/DTNOW`<br>`&          + WUC*DRHODX + WVC*DRHODY + WWC*DRHODZ)/RHOG(I,J,K)` | B 문서 오기 | p.10에서 실질미분을 뜻하는 기호는 점 있는 기호로 고친다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-042 | k·ε 압축항 부재 | `-k\frac{1-F}{\rho_G}\dot\rho_G`<br>`-\varepsilon\frac{1-F}{\rho_G}\dot\rho_G` | 2F manual p.17 식 (2.22)–(2.23); `3D2F/vf_k1cal.f:145–157`; `3D2F/vf_kgene.f:168–182`; `3D2F/vf_seuler.f:47–53`; `3D2F/vf_vpdrdt.f:79`; 2F manual p.57–60<br>`IF (NF(I,J,K).GT.-1) THEN`<br>`CALL VF_SEULER(XX,YY,ZZ,AK,GGV,GGV ,DBUF,FLKU,FLKV,FLKW,QK,NF)`<br>`CALL VF_SEULER(XX,YY,ZZ,AE,GGV,GGV ,DBUF,FLEU,FLEV,FLEW,QE,NF)` | E 코드 결함 후보 (중간) | 압축 모드의 k·ε 소멸항 부재는 중간 강도의 코드 결함 후보이다. VF_SEULER는 `IF (NF(I,J,K).GT.-1) THEN`에서 기체까지 갱신한다. KGENE의 QK·QE에는 기상밀도 변화 보정이 없다. `ISTATE=0`이면 이 차이는 소거된다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-050 | 온도 압축항 부재 | `-T\frac{1-F}{\rho_G}\dot\rho_G` | 2F manual p.5·18 식 (2.32); `3D2F/vf_t1cal.f:76–106`; `3D2F/vf_seuler.f:47–53`; `3D2F/vf_vpdrdt.f:79`; `3D2F/vf_a1main.f:1404–1408`; 2F manual p.57–60<br>`CALL VF_SEULER(XX,YY,ZZ,TT,GGV,GGV ,DBUF,FLTU,FLTV,FLTW,QT,NF)`<br>`QT  (I,J,K)=0.0D0`<br>`CAKIY CALL VF_TGENE` | E 코드 결함 후보 (약함) | 압축 모드에서 온도 수송을 켤 때 압축 소멸항 부재는 약한 코드 결함 후보이다. QT는 0이다. 온도 호출과 VF_SEULER는 DRHODT를 전달하지 않는다. 문서는 온도 수송을 Unused로 표시한다. 확산 호출의 인수 문제는 KF1-206이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-053 | 농도 압축항 부재 | `c_i`<br>`-c_i\frac{1-F}{\rho_G}\dot\rho_G` | 2F manual p.5·18 식 (2.35); `3D2F/vf_s1cal.f:79–110`; `3D2F/vf_seuler.f:47–53`; `3D2F/vf_vpdrdt.f:79`; `3D2F/vf_a1main.f:1413–1417`; 2F manual p.57–60<br>`QC  (I,J,K)=0.0D0`<br>`CAKIY   CALL VF_SGENE`<br>`CALL VF_SEULER(XX,YY,ZZ,CC(1,1,1,LC),`<br>`&                   GGV,GGV ,DBUF,FLCU,FLCV,FLCW,QC,NF)` | E 코드 결함 후보 (약함) | 압축 모드에서 농도 수송을 켤 때 압축 소멸항 부재는 약한 코드 결함 후보이다. QC는 0이다. 농도 호출과 VF_SEULER는 DRHODT를 전달하지 않는다. 문서는 농도 수송을 Unused로 표시한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-056 | 밀도 이류의 추가 공극률 비 | `\dot\rho_G=\gamma_v\frac{\partial\rho_G}{\partial t}+\gamma_xu\frac{\partial\rho_G}{\partial x}+\gamma_yv\frac{\partial\rho_G}{\partial y}+\gamma_zw\frac{\partial\rho_G}{\partial z}` | 2F manual p.24 식 (2.39); `3D2F/vf_v1eos.f:116–172`; `3D2F/vf_vpdrdt.f:98–104`; `3D2F/vf_vpcoef.f:421–423`; `3D2F/user_eos.f:33–34`<br>`GV = GGV(I,J,K)/GLV(I,J,K)`<br>`WUC = 0.5D0*( GGX(I+1,J,K)*UU(I+1,J,K)`<br>`&                     +GGX(I  ,J,K)*UU(I  ,J,K))*GV`<br>`WVC = 0.5D0*( GGY(I,J+1,K)*VV(I,J+1,K)`<br>`&                     +GGY(I,J  ,K)*VV(I,J  ,K))*GV` | E 코드 결함 후보 (중간) | 밀도 이류 계수의 추가 GGV/GLV는 중간 강도의 코드 결함 후보이다. 코드는 `GV = GGV(I,J,K)/GLV(I,J,K)`를 세 방향 이류에 곱한다. `ISTATE=0` 또는 `GGV=GLV`이면 이 차이는 소거된다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-202 | STATE·DENS-ERROR | (문서에 해당 입력 문법·기본값·검사 설명 없음) | 2F manual p.3·24; `3D2F/vf_iiopt.f:81–100`; `3D2F/vf_a2dflt.f:47–48·70–74`; `3D2F/user_eos.f:23–37`<br>`ELSEIF (TEXT(IS(2):IE(2)).EQ.'STATE') THEN`<br>`CALL VF_ZSTOI(ISTATE,TEXT(IS(3):IE(3)))`<br>`IF (ISTATE.GT.1) CALL VF_A2ERR('VF_IIOPT','INVALID VALUE.')`<br>`DO I=4,NWD`<br>`CALL VF_ZSTOR(SPARAM(I-3),TEXT(IS(I):IE(I)))` | C 문서 누락 | 기본 기상은 비압축성이다. STATE 1은 등온 EOS를 선택한다. 완화계수의 상한 1 검사는 없다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| 2f-theory:KF1-210 | 움직이는 공극률·속도 제한 | (문서에 해당 시간변화 공극률 소스·속도 제한식 없음) | 2F manual p.9–10·15–16; `3D2F/vf_vgene.f:129–130`; `3D2F/vf_veuler.f:155–156`; `3D2F/vf_seuler.f:49`; `3D2F/vf_iiopt.f:41–44`; `3D2F/vf_a2dflt.f:226`<br>`QU(I,J,K)=QU(I,J,K)+(GV1-GV)*DTI*U`<br>`VVMAX=30.0D0`<br>`IF (UU(I,J,K).GT. VVMAX) UU(I,J,K)= VVMAX`<br>`IF (UU(I,J,K).LT.-VVMAX) UU(I,J,K)=-VVMAX`<br>`IF     (TEXT(IS(2):IE(2)).EQ.'SUB-LOOP') THEN` | C 문서 누락 | 공극률 시간변화 소스에는 `QU(I,J,K)=QU(I,J,K)+(GV1-GV)*DTI*U`가 있다. 기본 속도 상한은 `VVMAX=30.0D0`이다. 속도가 ±VVMAX를 넘으면 해당 경계값으로 자른다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KF1.md) |
+| tutorials-build:KU1-951 | 노트의 DENS_ERROR 철자 | `2상 고유 추가 = §2.10(압축성, eq 2.38-2.39, p.485-486) + §3.3.12(Poisson 선형화, eq 3.127-3.128, p.522-523) + Overview(1)(b)(p.463-464) + 입력키워드(OPTION STATE·DENS_ERROR·MATE 2열 RHO0·배열 RHOG/RHOGO/DRHODP/DRHODT). 그 외 Ch2 분석모델·Ch3 이산화·VOF·k-ε·SMAC·조파·무반사는 [/3D 매뉴얼](cadmas-surf3d-english-manual-governing-equations.md)과 동일(인쇄페이지 463-622 = 더 큰 CDIT 문서의 연속 섹션).` | `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-2f-manual-compressibility.md:52`; `3D2F/A11111.in:707`; `3D2F/vf_iiopt.f:90–93` | B 문서 오기 | 입력 키워드는 `OPTION DENS-ERROR`다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KU1.md) |

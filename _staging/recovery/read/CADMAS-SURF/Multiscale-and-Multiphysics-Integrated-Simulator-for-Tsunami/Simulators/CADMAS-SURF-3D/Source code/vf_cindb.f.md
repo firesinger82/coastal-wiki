@@ -1,0 +1,22 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D/Source code/vf_cindb.f
+lines: 98
+sha256: d8bf6dc60d4fd643c4defe14452a6274940c9d5deb9efe00ee11aed4536ce0b2
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_cindb.f — 판독 구간 기록
+
+구간은 1행부터 98행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–27 | 경계면 지표 INDB의 주소·방향·조건 필드를 설정하는 루틴의 선언이다. 원문: `      SUBROUTINE VF_CINDB(NF,INDX,INDY,INDZ,INDB)` (1). `CD=== 概要 ===========================================================` (3) (개요). `CDT   VF_CINDB:境界面のインデックスINDBを設定する` (5) (VF_CINDB:경계면 지표 INDB 설정). `C==== 宣言 ===========================================================` (7) (선언). `C     -- 大域型 --` (9) (전역 형). `      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (10). `C     -- 大域変数 --` (12) (전역 변수). `      INCLUDE 'VF_A0PRM.h'` (13). `      INCLUDE 'VF_ANUMBI.h'` (14). `CD    -- 引数 --` (16) (인수). `CD    NF(@FOR-3D@)     : IN  : I*4 : セルの状態を示すインデックス` (17) (NF(@FOR-3D@)     : IN  : I*4 : 셀 상태 지표(index)). `CD    INDX(@FOR-3D@)   : IN  : I*4 : x面の状態を示すインデックス` (18) (INDX(@FOR-3D@)   : IN  : I*4 : x 면 상태 지표). `CD    INDY(@FOR-3D@)   : IN  : I*4 : y面の状態を示すインデックス` (19) (INDY(@FOR-3D@)   : IN  : I*4 : y 면 상태 지표). `CD    INDZ(@FOR-3D@)   : IN  : I*4 : z面の状態を示すインデックス` (20) (INDZ(@FOR-3D@)   : IN  : I*4 : z 면 상태 지표). `CD    INDB(MAXB1,NUMB) : OUT : I*4 : 境界面のインデックス` (21) (INDB(MAXB1,NUMB) : OUT : I*4 : 경계면 지표). `      DIMENSION NF  (NUMI,NUMJ,NUMK),INDX(NUMI,NUMJ,NUMK)` (22). `      DIMENSION INDY(NUMI,NUMJ,NUMK),INDZ(NUMI,NUMJ,NUMK)` (23). `      DIMENSION INDB(MAXB1,NUMB)` (24). `C==== 実行 ===========================================================` (26) (실행). |
+| 28–48 | 시작 시 `      SUBROUTINE VF_CINDB(NF,INDX,INDY,INDZ,INDB)` (1) 블록 안. 양수 x 면 번호에 대해 선형 주소를 저장한다. 현재 셀이 비장애물이면 방향 1,장애물이면 방향 2를 넣고 3–MAXB1 필드를 0으로 한다. NF의 유체·기체·장애물 구분 근거는 vf_cindc.f:38–49의 주석과 조건이다. 원문: `CD    -- x面に関する設定 --` (28) (x 면 설정). `      DO 130 K=2,NUMK-1` (29). `        DO 120 J=2,NUMJ-1` (30). `          DO 110 I=2,NUMI` (31). `            N2=NF  (I,J,K)` (32). `            NB=INDX(I,J,K)` (33). `            IF (NB.GE.1) THEN` (34). `              INDB(1,NB)=I+NUMI*(J-1)+NUMI*NUMJ*(K-1)` (35). `              IF (N2.NE.-1) THEN` (36). `                INDB(2,NB)=1` (37). `              ELSE` (38). `                INDB(2,NB)=2` (39). `              ENDIF` (40). `              DO 100 L=3,MAXB1` (41). `                INDB(L,NB)=0` (42). ` 100          CONTINUE` (43). `            ENDIF` (44). ` 110      CONTINUE` (45). ` 120    CONTINUE` (46). ` 130  CONTINUE` (47). [11-04 전수 검증 보완] |
+| 49–69 | 시작 시 `      SUBROUTINE VF_CINDB(NF,INDX,INDY,INDZ,INDB)` (1) 블록 안. y 면도 같은 방식으로 주소·방향 3 또는 4·나머지 필드 0을 저장한다. 원문: `CD    -- y面に関する設定 --` (49) (y 면 설정). `      DO 230 K=2,NUMK-1` (50). `        DO 220 J=2,NUMJ` (51). `          DO 210 I=2,NUMI-1` (52). `            N2=NF  (I,J,K)` (53). `            NB=INDY(I,J,K)` (54). `            IF (NB.GE.1) THEN` (55). `              INDB(1,NB)=I+NUMI*(J-1)+NUMI*NUMJ*(K-1)` (56). `              IF (N2.NE.-1) THEN` (57). `                INDB(2,NB)=3` (58). `              ELSE` (59). `                INDB(2,NB)=4` (60). `              ENDIF` (61). `              DO 200 L=3,MAXB1` (62). `                INDB(L,NB)=0` (63). ` 200          CONTINUE` (64). `            ENDIF` (65). ` 210      CONTINUE` (66). ` 220    CONTINUE` (67). ` 230  CONTINUE` (68). |
+| 70–98 | 시작 시 `      SUBROUTINE VF_CINDB(NF,INDX,INDY,INDZ,INDB)` (1) 블록 안. z 면의 주소·방향 5 또는 6·나머지 필드 0을 저장한 뒤 반환한다. 원문: `CD    -- z面に関する設定 --` (70) (z 면 설정). `      DO 330 K=2,NUMK` (71). `        DO 320 J=2,NUMJ-1` (72). `          DO 310 I=2,NUMI-1` (73). `            N2=NF  (I,J,K)` (74). `            NB=INDZ(I,J,K)` (75). `            IF (NB.GE.1) THEN` (76). `              INDB(1,NB)=I+NUMI*(J-1)+NUMI*NUMJ*(K-1)` (77). `              IF (N2.NE.-1) THEN` (78). `                INDB(2,NB)=5` (79). `              ELSE` (80). `                INDB(2,NB)=6` (81). `              ENDIF` (82). `              DO 300 L=3,MAXB1` (83). `                INDB(L,NB)=0` (84). ` 300          CONTINUE` (85). `            ENDIF` (86). ` 310      CONTINUE` (87). ` 320    CONTINUE` (88). ` 330  CONTINUE` (89). `C     -- 実行文の終了 --` (91) (실행문 종료). `      GOTO 9999` (92). `C==== 終了 ===========================================================` (94) (종료). ` 9999 CONTINUE` (96). `      RETURN` (97). `      END` (98). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+없음

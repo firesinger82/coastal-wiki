@@ -1,0 +1,40 @@
+flowchart TD
+ a01["INIT_MPMD<br/>3D vf_a1main.f:351"]
+ a02["VF_P0INIT · VF_PMGINP<br/>3D vf_a1main.f:357 · :367"]
+ a03["VF_A2DFLT · VF_STOC_INIT<br/>3D vf_a1main.f:390 · :394"]
+ a04["VF_II1INP · 배열 할당<br/>3D vf_a1main.f:402 · :565 · :657"]
+ a05["VF_IP1INP · VF_CGLV · VF_CGLXYZ<br/>3D vf_a1main.f:701 · :723 · :724"]
+ a06["VF_CSETUP · VF_OL1INI<br/>3D vf_a1main.f:784 · :790"]
+ a07["VF_CINIT (IRETYP.LT.0)<br/>3D vf_a1main.f:815"]
+ a08["VF_IR1INP (ELSE)<br/>3D vf_a1main.f:835"]
+ a09["VF_STOC_RECV · VF_STOC_SEND (NB_SC.GT.0)<br/>3D vf_a1main.f:851 · :853"]
+ a10["VF_OG1INI · VF_OR1INI · VF_OM1INI · VF_OT1INI<br/>3D vf_a1main.f:858 · :862 · :865 · :868"]
+ a11["VF_PMGP2C · VF_PMGC2P<br/>3D vf_a1main.f:923 · :929"]
+ a12["VF_A1MAIN: DT=DTCNST (IDTTYP.EQ.0)<br/>3D vf_a1main.f:938"]
+ a13["VF_CDTCAL (ELSE)<br/>3D vf_a1main.f:940"]
+ a14["VF_A1MAIN 종료 후보<br/>(NNOW.GE.NEND .OR. (TNOW+0.5D0*DT).GE.TEND)<br/>3D vf_a1main.f:947"]
+ a15["VF_OL1TRN · VF_OG1TRN · VF_OM1TRN · VF_OR1TRN · VF_OT1TRN<br/>3D vf_a1main.f:962 · :971 · :979 · :982 · :990"]
+ a16["VF_P0TIME · MPI_ALLREDUCE<br/>(WTM2-WTM1.GT.ETIME)<br/>3D vf_a1main.f:1000 · :1003"]
+ a17["VF_A1MAIN (IE.EQ.1 .OR. IEE.EQ.1)<br/>GOTO 1000<br/>3D vf_a1main.f:1007"]
+ a18["VF_STOC_RECV · VF_STOC_SEND (NB_SC.GT.0)<br/>3D vf_a1main.f:1011 · :1012"]
+ a19["MPI_ALLREDUCE: DT의 MPI_MIN<br/>3D vf_a1main.f:1018"]
+ a20["VF_BWUWN · VF_BWUWT · VF_BWFF (NB_SC.GT.0)<br/>3D vf_a1main.f:1021 · :1025 · :1026"]
+ a21["VF_IP1INP (IPRNT.GT.1) · VF_CWMSRC (ISCTYP(1).NE.0)<br/>3D vf_a1main.f:1033 · :1037"]
+ a22["VF_V1CAL (DO 600 ILOOP=1,LOOPS)<br/>3D vf_a1main.f:1044 · :1058"]
+ a23["VF_T1CAL (LEQT.NE.0) · VF_S1CAL (LEQC.GT.0)<br/>3D vf_a1main.f:1077 · :1086"]
+ a24["VF_K1CAL (LEQK.NE.0)<br/>3D vf_a1main.f:1095"]
+ a25["VF_F1CAL<br/>3D vf_a1main.f:1104"]
+ a26["VF_BWKELG · VF_CNUT0 · VF_CNU00 (LEQK.NE.0)<br/>VF_BWSS (LEQT.NE.0 / DO 710 LC=1,LEQC)<br/>3D vf_a1main.f:1120 · :1124 · :1125 · :1132 · :1140"]
+ a27["VF_A1MAIN: GOTO 500<br/>3D vf_a1main.f:1145"]
+ a28["VF_OR1TRN (IEE.EQ.1)<br/>3D vf_a1main.f:1170"]
+ a29["VF_OM1TRN: iflag=-1<br/>3D vf_a1main.f:1179"]
+ a30["VF_A2CLOS · VF_P0END<br/>3D vf_a1main.f:1191 · :1194"]
+ a01 --> a02 --> a03 --> a04 --> a05 --> a06
+ a06 --> a07 --> a09
+ a06 --> a08 --> a09
+ a09 --> a10 --> a11
+ a11 --> a12 --> a14
+ a11 --> a13 --> a14
+ a14 --> a15 --> a16 --> a17
+ a17 -->|"종료"| a28 --> a29 --> a30
+ a17 -->|"계산 계속"| a18 --> a19 --> a20 --> a21 --> a22 --> a23 --> a24 --> a25 --> a26 --> a27 --> a11

@@ -1,0 +1,24 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D2F/Source code/sf_pface3.f
+lines: 112
+sha256: e8e48250a764e88add1bfb4570d6505ebd2a2e73570ad68caad554f4953a78e4
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# sf_pface3.f — 판독 구간 기록
+
+구간은 1행부터 112행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–31 | SF_PFACE3의 선언부다. AFC_MIN의 DATA 값은 1.D-4이다(16). MYRANK>0이면 반환한다(18). AFC를 0으로 초기화한다(20). IPFACE0(1,I)>0 또는 IPFACE0(2,I)>0이면 AFC(I)를 1로 설정한다(22–24). ICON=0이면 반환한다(26). EPS는 E_MEAN의 1.D-9배다(28). EPSZ는 E_MEAN의 1.D-2배다(30). 원문(연속 표시는 앞 문장에 이어짐): `      SUBROUTINE SF_PFACE3()` (1); `      USE SF_ARRAY` (3); `      IMPLICIT REAL*8(A-H,O-Z)` (5); `      INCLUDE 'VF_A0PRM.h'` (7); `      INCLUDE 'VF_APARAI.h'` (8); `      INCLUDE 'SF_STRUCT.h'` (9); `      DIMENSION XS(3,3),TR(3,3),X0(3),XS2(2,3),XS2G(2),XM(3,3),XM2(2,3)` (11); `     &         ,XM2G(2),X(3,3)` (12); `      REAL(8), POINTER :: SFC0(:),SFC(:)` (14); `      DATA AFC_MIN /1.D-4/` (16); `      IF( MYRANK > 0 ) RETURN` (18); `      AFC(:) = 0.D0` (20); `      DO I = 1, NPFC0` (22); `        IF( IPFACE0(1,I) > 0 .OR. IPFACE0(2,I) > 0 ) AFC(I) = 1.D0` (23); `      ENDDO` (24); `      IF( ICON == 0 ) RETURN` (26); `      EPS = E_MEAN * 1.D-9` (28); `      EPSZ = E_MEAN * 1.D-2` (30). [11-04 전수 검증 정정] |
+| 32–48 | 시작 시 1행 SF_PFACE3 루틴 안. SF_PFACE3 안이며 앞 분기 밖. SFC0·SFC를 할당한다(35–37). ICTR의 각 삼각형 좌표로 SF_STRIA를 호출하고 면별 면적을 누적한다(39–45). SFC를 0으로 초기화한다(47). 원문(연속 표시는 앞 문장에 이어짐): `      ! SFC0 : 表面要素の面積` (32) (SFC0는 표면 요소 면적); `      ! SFC  : 接触面同士の干渉により覆われている面積` (33) (SFC는 접촉면끼리 간섭하여 덮인 면적); `      ALLOCATE( SFC0(NPFC0), STAT=IERR )` (35); `      ALLOCATE( SFC(NPFC0), STAT=IERR )` (36); `      IF( IERR /= 0 ) CALL VF_A2ERR('SF_PFACE3','CAN NOT ALLOC.')` (37); `      SFC0(:) = 0.` (39); `      DO I = 1, NCTR` (41); `        X(:,:) = POS0(:,ICTR(2:4,I))` (42); `        CALL SF_STRIA(S,X,3)` (43); `        SFC0( ICTR(1,I) ) = SFC0( ICTR(1,I) ) + S` (44); `      ENDDO` (45); `      SFC(:) = 0.` (47). |
+| 49–76 | 시작 시 1행 SF_PFACE3 루틴 안. SF_PFACE3 안이며 앞 면적 루프 밖. IBDY=1,NICRG 루프에서 SF_ADDSET을 호출한 뒤 I=IS,IE를 반복한다(49–53). 55행 주석의 지반면을 건너뛴 뒤 SF_TRM1과 SF_CSCRIB을 호출한다(55–61). ICTB(IBDY,JBDY)가 0이 아니고 IPFACE0(2,ICTR(1,J))가 양수가 아니면 SF_TRNS1을 호출한다(63–75). 원문(연속 표시는 앞 문장에 이어짐): `      DO IBDY = 1, NICRG` (49); `        CALL SF_ADDSET(IS,IE,ICRG,IBDY)` (51); `        DO I = IS, IE` (53); `          IF( IPFACE0( 2, ICTR(1,I) ) > 0 ) CYCLE  ! 地盤面は無視` (55) (지반면은 무시); `          XS(:,:) = POS0(:,ICTR(2:4,I))` (57); `          CALL SF_TRM1(TR,X0,XS2,XS)` (59); `          CALL SF_CSCRIB(XS2G,RS,XS2)` (61); `          DO JBDY = 1, NICRG` (63); `            IF( ICTB(IBDY,JBDY) == 0 ) CYCLE` (65); `            CALL SF_ADDSET(JS,JE,ICRG,JBDY)` (67); `            DO J = JS, JE` (69); `              IF( IPFACE0( 2, ICTR(1,J) ) > 0 ) CYCLE` (71); `              XM(:,:) = POS0(:,ICTR(2:4,J))` (73); `              CALL SF_TRNS1(XM,EZ,X0,TR)` (75). 해석: IBDY·JBDY는 물체 번호로 읽힌다. 해석: SF_TRM1·SF_CSCRIB 호출은 좌표 변환과 원 정보 계산으로 읽힌다. [11-04 전수 검증 정정] |
+| 77–101 | 시작 시 `      DO IBDY = 1, NICRG` (49), `        DO I = IS, IE` (53), `          DO JBDY = 1, NICRG` (63), `            DO J = JS, JE` (69) 안이다. 각 루프는 100·98·96·94행 ENDDO에서 닫힌다. EZ>.9D0와 XM(3,1:3)의 절댓값 중 최댓값<EPSZ를 함께 만족하지 않으면 건너뛴다(77–79). XM의 첫 두 행을 XM2로 복사한 뒤 SF_CSCRIB과 SF_LENGTH를 호출한다(81–85). DXSM>RS+RM이면 건너뛴다(87). SF_CUT2TR의 면적 S를 양쪽 면 SFC에 누적한다(89–92). 원문(연속 표시는 앞 문장에 이어짐): `              IF( .NOT. ( EZ > .9D0 .AND.` (77); `     &            DMAX1( DABS(XM(3,1)), DABS(XM(3,2)), DABS(XM(3,3)) )` (78); `     &            < EPSZ ) ) CYCLE` (79); `              XM2(:,:) = XM(1:2,:)` (81); `              CALL SF_CSCRIB(XM2G,RM,XM2)` (83); `              CALL SF_LENGTH(DXSM,XS2G,XM2G,2)` (85); `              IF( DXSM > RS + RM ) CYCLE` (87); `              CALL SF_CUT2TR(S,XM2,XS2,EPS)` (89); `              SFC( ICTR(1,I) ) = SFC( ICTR(1,I) ) + S` (91); `              SFC( ICTR(1,J) ) = SFC( ICTR(1,J) ) + S` (92); `            ENDDO` (94); `          ENDDO` (96); `        ENDDO` (98); `      ENDDO` (100). 해석: DXSM은 두 원의 중심 거리로 읽힌다. [11-04 전수 검증 정정] |
+| 102–112 | 시작 시 1행 SF_PFACE3 루틴 안. SF_PFACE3 안이며 접촉 쌍 루프 밖. SFC가 0인 면은 건너뛴다(102–103). AFC에서 SFC/SFC0를 빼고 AFC_MIN 미만이면 0으로 만든다(104–105). SFC0·SFC를 해제한다(108–110). 원문(연속 표시는 앞 문장에 이어짐): `      DO I = 1, NPFC0` (102); `        IF( SFC(I) == 0. ) CYCLE` (103); `        AFC(I) = AFC(I) - SFC(I) / SFC0(I)` (104); `        IF( AFC(I) < AFC_MIN ) AFC(I) = 0.` (105); `      ENDDO` (106); `      DEALLOCATE( SFC0, STAT = IERR )` (108); `      DEALLOCATE( SFC, STAT = IERR )` (109); `      IF( IERR /= 0 ) CALL VF_A2ERR('SF_PFACE3','CAN NOT DEALLOC.')` (110); `      END` (112). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 35–37·108–110: 연속한 두 ALLOCATE 또는 DEALLOCATE는 같은 IERR를 사용한다. 각 쌍의 두 번째 호출 뒤에만 IERR 검사가 있다.
+- 103–105: 나눗셈 실행 전 검사는 SFC(I)==0이며 SFC0(I)==0을 검사하는 조건문은 이 구간에 없다.

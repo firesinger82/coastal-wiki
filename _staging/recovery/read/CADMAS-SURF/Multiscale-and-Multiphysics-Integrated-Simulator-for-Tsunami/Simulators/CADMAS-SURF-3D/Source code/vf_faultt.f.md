@@ -1,0 +1,21 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D/Source code/vf_faultt.f
+lines: 99
+sha256: d853c080df57ca479886ca441b769ad7d4d9ef4af2a8ce636981fd3de8953676
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_faultt.f — 판독 구간 기록
+
+구간은 1행부터 99행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–54 | 단층(fault) 매개변수로 수위 변동량을 계산한다. MOD_FAULT 항목과 격자·전역 수위 변화 배열을 선언한다. `X1=0.5D0*(XX(1,I)+XX(1,I+1))`과 `Y1=0.5D0*(YY(1,J)+YY(1,J+1))`을 계산하여 EN2LB에 넘긴다. `ISYSTEM.NE.JSYSTEM`이면 LB2LB를 더 호출한다. 결과를 L1ARRAY·B1ARRAY에 저장한다. 해석: X1·Y1은 셀 중심 좌표로 볼 수 있지만 이 구간에는 XX·YY의 첫 번째 성분 정의가 없다. 원문: `      SUBROUTINE VF_FAULTT(DELH,TIM1,XX,YY)` (1) `CD=== 概要 ===========================================================` (3) (개요) `CDT   VF_FAULTT:断層パラメータから水位変動量を計算する` (5) (단층 매개변수로 수위 변동량 계산) `C==== 宣言 ===========================================================` (7) (선언) 연속문: `      USE MOD_FAULT,ONLY: EN2LB,LB2LB,D2R,ICOORD,ISYSTEM,JSYSTEM,` (9); `     $                    NFLT,NFLTNOW,FPARAM,DISPLACE,XOR,YOR` (10) `C     -- 大域型 --` (12) (전역 자료형) `      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (13) 주석: `C      IMPLICIT NONE` (14) `      INCLUDE 'VF_A0PRM.h'` (15) `      INCLUDE 'VF_AFILEI.h'` (16) `      INCLUDE 'VF_ANUMBI.h'` (17) `      INCLUDE 'VF_APARAI.h'` (18) `      REAL(8):: DELH(NUMI0,NUMJ0)` (20) `      REAL(8):: XX(MAXG1,NUMI),YY(MAXG1,NUMJ)` (21) `      REAL(8):: TIM1` (22) `      REAL(8):: TIMESBX,X1,Y1,L1,B1,L2,B2,ZZ` (23) `      REAL(8):: PARAM2(6),STR,DIP,SLIP` (24) `      INTEGER:: I,J` (25) `      REAL(8),ALLOCATABLE:: L1ARRAY(:,:)` (26) `      REAL(8),ALLOCATABLE:: B1ARRAY(:,:)` (27) 주석: `c      ALLOCATE(L1ARRAY(2:NUMI0-1,2:NUMJ0-1),` (30) 주석: `c     $         B1ARRAY(2:NUMI0-1,2:NUMJ0-1))` (31) 연속문: `      ALLOCATE(L1ARRAY(MYIS:MYIE,MYJS:MYJE),` (32); `     $         B1ARRAY(MYIS:MYIE,MYJS:MYJE))` (33) 주석: `c      DO J=2,NUMJ0-1` (35) 주석: `c      DO I=2,NUMI0-1` (36) `      DO J=MYJS,MYJE` (37) `      DO I=MYIS,MYIE` (38) `         X1=0.5D0*(XX(1,I)+XX(1,I+1))` (39) `         Y1=0.5D0*(YY(1,J)+YY(1,J+1))` (40) `         CALL EN2LB(X1,Y1,L1,B1,ICOORD,ISYSTEM)` (42) `         IF( ISYSTEM.NE.JSYSTEM ) THEN` (44) `            CALL LB2LB(L1,B1,L2,B2,ISYSTEM,JSYSTEM)` (45) `            L1=L2` (46) `            B1=B2` (47) `         ENDIF` (48) `         L1ARRAY(I,J)=L1` (50) `         B1ARRAY(I,J)=B1` (51) `      ENDDO` (52) `      ENDDO` (53) [11-04 전수 검증 정정] |
+| 55–99 | 시작 시 1행 VF_FAULTT 루틴 안이며 조건·루프 밖. FPARAM의 4·5·6번째 성분을 STR·DIP·SLIP에 복사한다. 각 값의 SIN·COS를 PARAM2에 저장한다. 해석: STR·DIP·SLIP은 주향·경사·미끄럼각으로 보이지만 이 구간에는 해당 정의가 없다. DISPLACE 결과 ZZ를 전역 인덱스의 DELH에 누적한다. NFLTNOW를 증가시킨 뒤 TIM1까지의 단층 처리를 100번 표지로 반복한다. 작업 배열을 해제한다. 원문: `  100 CONTINUE` (55) `      STR =FPARAM(4,NFLTNOW)` (57) `      DIP =FPARAM(5,NFLTNOW)` (58) `      SLIP=FPARAM(6,NFLTNOW)` (59) `      PARAM2(1)=SIN(DIP)` (60) `      PARAM2(2)=COS(DIP)` (61) `      PARAM2(3)=SIN(SLIP)` (62) `      PARAM2(4)=COS(SLIP)` (63) `      PARAM2(5)=SIN(STR)` (64) `      PARAM2(6)=COS(STR)` (65) 주석: `c      DO J=2,NUMJ0-1` (67) 주석: `c      DO I=2,NUMI0-1` (68) `      DO J=MYJS,MYJE` (69) `      DO I=MYIS,MYIE` (70) `         L1=L1ARRAY(I,J)` (71) `         B1=B1ARRAY(I,J)` (72) `         CALL DISPLACE(L1,B1,XOR,FPARAM(1,NFLTNOW),PARAM2,ZZ)` (73) `         IG = I + MYGIS - 1` (75) `         JG = J + MYGJS - 1 ` (76) `         DELH(IG,JG)=DELH(IG,JG)+ZZ` (77) `      ENDDO` (78) `      ENDDO` (79) `      NFLTNOW=NFLTNOW+1` (81) `      IF(NFLTNOW.GT.NFLT) THEN` (82) 주석: `c         write(ILPFIL,*) '### FAULT DATA: END OF DATA'` (83) `         TIMESBX=1.D30` (84) `      ELSE` (85) `         TIMESBX=FPARAM(10,NFLTNOW)` (86) `      ENDIF` (87) 주석: `c      write(6,*) 'faultt: tim1,timesbx=',tim1,timesbx` (88) `      IF( TIM1.GE.TIMESBX ) GOTO 100` (89) 주석: `c      write(89,'(f8.3,4i8)') FPARAM(10,NFLTNOW-1),2,NUMI0-1,2,NUMJ0-1` (91) 주석: `c      do j=2,NUMJ0-1` (92) 주석: `c         write(89,'(<NUMI0-2>f8.3)') (delh(i,j),i=2,NUMI0-1)` (93) 주석: `c      enddo` (94) `      DEALLOCATE(L1ARRAY,B1ARRAY)` (96) `      RETURN` (98) `      END` (99) [11-04 전수 검증 정정] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 81–89: 마지막 단층 뒤 TIMESBX=1.D30을 설정한다. TIM1.GE.TIMESBX 조건이면 100번 표지로 돌아간다.
+- 20·75–77: DELH는 전역 크기 NUMI0·NUMJ0로 선언하며 지역 I·J에 MYGIS-1·MYGJS-1을 더해 접근한다.

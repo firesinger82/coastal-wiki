@@ -1,0 +1,23 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D/Source code/vf_or1ini.f
+lines: 106
+sha256: 592adcb3678e3bafc9578aefaf8361a00eb30ee303ad0459ff9defd31c19575d
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_or1ini.f — 판독 구간 기록
+
+구간은 1행부터 106행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–27 | 상세 결과 파일(detailed result file) 초기화 루틴의 형식·포함 파일·공극률(porosity) 배열과 파일명용 문자열을 선언한다. 원문: `      SUBROUTINE VF_OR1INI(GGV,ETIME)` (1). `CD=== 概要 ===========================================================` (3) (개요). `CDT   VF_OR1INI:詳細ファイルに格子数等を出力する` (5) (상세 파일(detailed result file)에 격자 수 등을 출력한다). `C==== 宣言 ===========================================================` (7) (선언). `C     -- 大域型 --` (9) (전역 형식). `      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (10). `C     -- 大域変数 --` (12) (전역 변수). `      INCLUDE 'VF_A0PRM.h'` (13). `      INCLUDE 'VF_AFILEI.h'` (14). `      INCLUDE 'VF_ANUMBI.h'` (15). `      INCLUDE 'VF_APARAI.h'` (16). `      INCLUDE 'VF_APHYSI.h'` (17). `CD    -- 引数 --` (19) (인수). `CD    GGV(@FOR-3D@) : IN  : R*8 : 空隙率` (20) (공극률(porosity)). `      DIMENSION GGV(NUMI,NUMJ,NUMK)` (21). `CD    -- 局所変数 --` (23) (지역 변수). `      CHARACTER*5 TEXTP` (24). `C==== 実行 ===========================================================` (26) (실행). |
+| 28–59 | 시작 시 1행 루틴 `SUBROUTINE VF_OR1INI` 안. IRSTYP=0이고 ETIME=1.0D30이면 출력 없이 종료한다. 그렇지 않으면 단일 또는 5자리 랭크(rank)를 붙인 .rsl 파일을 신규 비서식(unformatted)으로 연다. 버전·격자 수·조건부 병렬 분할 정보를 기록한다. 원문: `CD    -- 出力指定がなければ抜ける --` (28) (출력 지정이 없으면 빠져나간다). `      IF (IRSTYP.EQ.0.AND.ETIME.EQ.1.0D30) GOTO 9000` (29). `CD    -- 詳細ファイルのオープンとメッセージの出力 --` (31) (상세 파일 열기 및 메시지 출력). `      IRSFIL=0` (32). `      IF (NPROCS.EQ.1) THEN` (33). 연속문: `        OPEN(MFILRS,ERR=9010,` (34); `     &       FILE=MGNAME(MGRANK+1)(1:MGNLEN(MGRANK+1))//'.rsl',` (35); `     &       STATUS='NEW',FORM='UNFORMATTED' )` (36). `      ELSE` (37). `        WRITE(TEXTP,'(I5.5)') MYRANK` (38). 연속문: `        OPEN(MFILRS,ERR=9010,` (39); `     &       FILE=MGNAME(MGRANK+1)(1:MGNLEN(MGRANK+1))//'.rsl'//TEXTP,` (40); `     &       STATUS='NEW',FORM='UNFORMATTED' )` (41). `      ENDIF` (42). `      IRSFIL=MFILRS` (43). `      WRITE(ILPFIL,9510)` (44). `CD    -- バージョンを出力 --` (46) (버전 출력). `      WRITE(IRSFIL,ERR=9020) IVR001,IVR002` (47). `CD    -- 格子数等を出力 --` (49) (격자 수 등 출력). `      WRITE(IRSFIL,ERR=9020) NUMI,NUMJ,NUMK,NUMB` (50). `CD    -- 並列時にはその情報を出力 --` (52) (병렬일 때 해당 정보 출력). `      IF (NPROCS.NE.1) THEN` (53). `        WRITE(IRSFIL,ERR=9020) NPROCS` (54). `        WRITE(IRSFIL,ERR=9020) MYIS ,MYIE ,MYJS ,MYJE` (55). `        WRITE(IRSFIL,ERR=9020) MYMIS,MYMIE,MYMJS,MYMJE` (56). `        WRITE(IRSFIL,ERR=9020) MYGIS,MYGIE,MYGJS,MYGJE` (57). `      ENDIF` (58). |
+| 60–83 | 시작 시 1행 루틴 `SUBROUTINE VF_OR1INI` 안. 시간별 출력 물리량 플래그(flag)를 구성한다. 기본 셀 상태·유속·압력·VOF 함수(volume of fluid function)를 켜고 활성 방정식과 시간 변화 공극률·물방울 조건에 따라 추가 플래그를 설정한다. 출력 대상의 대응 근거는 같은 원문 디렉터리의 `vf_or1trn.f:108–224`이다. IPRNT<=1이면 전체 공극률 배열을 기록한다. 원문: `CD    -- 時間毎に出力する物理量のフラグを出力 --` (60) (시간마다 출력할 물리량 플래그(flag) 출력). `      LN=1` (61). `      LV=1` (62). `      LP=1` (63). `      LF=1` (64). `      LK=0` (65). `      IF (LEQK .NE.0) LK=1` (66). `      LT=0` (67). `      IF (LEQT .NE.0) LT=1` (68). `      LS=0` (69). `      IF (LEQC .GE.1) LS=LEQC` (70). `      LG=0` (71). `      IF (IPRNT.GT.1) LG=1` (72). `      LD=0` (73). `      IF (IDROP.GE.1) LD=1` (74). `      L1=0` (75). `      WRITE(IRSFIL,ERR=9020) LN,LV,LP,LF,LK,LT,LS,LG,LD,L1` (76). `CD    -- 空隙率を出力 --` (78) (공극률(porosity) 출력). `      IF (IPRNT.LE.1) THEN` (79). 연속문: `        WRITE(IRSFIL,ERR=9020)` (80); `     &          (((GGV(I,J,K),I=1,NUMI),J=1,NUMJ),K=1,NUMK)` (81). `      ENDIF` (82). [11-04 전수 검증 보완] |
+| 84–106 | 시작 시 1행 루틴 `SUBROUTINE VF_OR1INI` 안. 파일 열기·쓰기 오류를 VF_A2ERR로 처리하고 출력 메시지 형식문을 두고 반환한다. 원문: `C     -- 実行文の終了 --` (84) (실행문 종료). ` 9000 CONTINUE` (85). `      GOTO 9999` (86). `C==== ファイル関連エラー処理 =========================================` (88) (파일 관련 오류 처리). ` 9010 CONTINUE` (90). `      CALL VF_A2ERR('VF_OR1INI','CAN NOT OPEN (*****.rsl).')` (91). `      GOTO 9999` (92). ` 9020 CONTINUE` (94). `      CALL VF_A2ERR('VF_OR1INI','WRITE ERROR (*****.rsl).')` (95). `      GOTO 9999` (96). `C==== フォーマット文 =================================================` (98) (형식문). ` 9510 FORMAT( ' ','>> FILE-RSL : OUT : INITIAL')` (100). `C==== 終了 ===========================================================` (102) (종료). ` 9999 CONTINUE` (104). `      RETURN` (105). `      END` (106). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 29: 출력 생략 조건은 IRSTYP=0과 ETIME=1.0D30의 동시 성립이다. IRSTYP=0만으로는 생략하지 않는다.
+- 1·19–21: ETIME은 서브루틴 인수이지만 인수 설명 주석에는 GGV만 있다.

@@ -1,0 +1,21 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D2F/Source code/vf_ogbcin.f
+lines: 94
+sha256: c30812596f6abc4531a451e06be22b4492d016fbaae573ac4673f257e31fb097
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_ogbcin.f — 판독 구간 기록
+
+구간은 1행부터 94행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–41 | 도화(graphics) 경계 지표를 배열에 저장하는 VF_OGBCIN의 개요·대역형·대역변수·인수 선언이다(5–24). INDB는 경계면 지표, NWKBC는 작업배열, NBX·NBY·NBZ는 방향별 경계면 수다(19–23). 초기 설정은 출력영역의 지역 격자 제한과 방향별 저장 시작 위치 계산이다(28–40). 원문: `      SUBROUTINE VF_OGBCIN(INDB,NWKBC,NBX,NBY,NBZ)` (1) / `CD=== 概要 ===========================================================` (개요) (3) / `CDT   VF_OGBCIN:図化用の境界のインデックスを配列に格納する` (도화용 경계 지표를 배열에 저장함) (5) / `C==== 宣言 ===========================================================` (선언) (7) / `C     -- 大域型 --` (대역형) (9) / `      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (10) / `C     -- 大域変数 --` (대역변수) (12) / `      INCLUDE 'VF_A0PRM.h'` (13) / `      INCLUDE 'VF_AFILEI.h'` (14) / `      INCLUDE 'VF_ANUMBI.h'` (15) / `      INCLUDE 'VF_APARAI.h'` (16) / `CD    -- 引数 --` (인수) (18) / `CD    INDB (MAXB1,NUMB) : IN  : I*4 : 境界面のインデックス` (경계면 지표) (19) / `CD    NWKBC(NUMB)       : OUT : I*4 : ワーク配列` (작업배열) (20) / `CD    NBX               : IN  : I*4 : x方向境界面の数` (x 방향 경계면 수) (21) / `CD    NBY               : IN  : I*4 : y方向境界面の数` (y 방향 경계면 수) (22) / `CD    NBZ               : IN  : I*4 : z方向境界面の数` (z 방향 경계면 수) (23) / `      DIMENSION INDB(MAXB1,NUMB),NWKBC(NUMB)` (24) / `C==== 実行 ===========================================================` (실행) (26) / `CD    -- 初期設定 --` (초기 설정) (28) / `      I1=MAX(IGRARA(1)-(MYGIS-1),MYIS)` (29) / `      J1=MAX(IGRARA(2)-(MYGJS-1),MYJS)` (30) / `      K1=IGRARA(3)` (31) / `      I2=MIN(IGRARA(4)-(MYGIS-1),MYIE)` (32) / `      J2=MIN(IGRARA(5)-(MYGJS-1),MYJE)` (33) / `      K2=IGRARA(6)` (34) / `      IX=I2+1` (35) / `      JY=J2+1` (36) / `      KZ=K2+1` (37) / `      NX=0` (38) / `      NY=NBX` (39) / `      NZ=NBX+NBY` (40) |
+| 42–94 | 시작 시 1행 루틴 안. 수를 센다는 주석이다(42). NUMB 범위에서 비양수 지표를 건너뛰고 선형 지표를 I·J·K로 복원한다(43–50). NS=1/2는 x면, NS=3/4는 y면, ELSE는 z면 위치에 따라 출력영역과 해당 축의 시작·종료 지표가 서로 다른지를 검사하여 방향별 배열 구간에 원래 경계 지표를 저장한다(51–84). 실행문 종료·종료부다(87–94). 원문: `CD    -- 数を数える --` (수를 셈) (42) / `      DO 100 L=1,NUMB` (43) / `        IJK=INDB(1,L)` (44) / `        IF (IJK.LE.0) GOTO 100` (45) / `        NS =INDB(2,L)` (46) / `        K  =(IJK-1)/(NUMI*NUMJ)+1` (47) / `        IJK=IJK-NUMI*NUMJ*(K-1)` (48) / `        J  =(IJK-1)/NUMI+1` (49) / `        I  =IJK-NUMI*(J-1)` (50) / `        IF     (NS.EQ.1 .OR. NS.EQ.2) THEN` (51) / `          IF (I1.NE.I2) THEN` (52) / `            IF (I1.LE.I .AND. I.LE.IX) THEN` (53) / `              IF (J1.LE.J .AND. J.LE.J2) THEN` (54) / `                IF (K1.LE.K .AND. K.LE.K2) THEN` (55) / `                  NX=NX+1` (56) / `                  NWKBC(NX)=INDB(1,L)` (57) / `                ENDIF` (58) / `              ENDIF` (59) / `            ENDIF` (60) / `          ENDIF` (61) / `        ELSEIF (NS.EQ.3 .OR. NS.EQ.4) THEN` (62) / `          IF (J1.NE.J2) THEN` (63) / `            IF (I1.LE.I .AND. I.LE.I2) THEN` (64) / `              IF (J1.LE.J .AND. J.LE.JY) THEN` (65) / `                IF (K1.LE.K .AND. K.LE.K2) THEN` (66) / `                  NY=NY+1` (67) / `                  NWKBC(NY)=INDB(1,L)` (68) / `                ENDIF` (69) / `              ENDIF` (70) / `            ENDIF` (71) / `          ENDIF` (72) / `        ELSE` (73) / `          IF (K1.NE.K2) THEN` (74) / `            IF (I1.LE.I .AND. I.LE.I2) THEN` (75) / `              IF (J1.LE.J .AND. J.LE.J2) THEN` (76) / `                IF (K1.LE.K .AND. K.LE.KZ) THEN` (77) / `                  NZ=NZ+1` (78) / `                  NWKBC(NZ)=INDB(1,L)` (79) / `                ENDIF` (80) / `              ENDIF` (81) / `            ENDIF` (82) / `          ENDIF` (83) / `        ENDIF` (84) / ` 100  CONTINUE` (85) / `C     -- 実行文の終了 --` (실행문 종료) (87) / `      GOTO 9999` (88) / `C==== 終了 ===========================================================` (종료) (90) / ` 9999 CONTINUE` (92) / `      RETURN` (93) / `      END` (94) [11-04 전수 검증 정정] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 43–45: 반복 범위는 NUMB이고 비양수 INDB(1,L)은 건너뛴다.
+- 52·63·74: 해당 축 출력영역의 시작 지표와 종료 지표가 같으면 그 방향 경계를 저장하지 않는다.

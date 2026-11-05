@@ -1,13 +1,14 @@
 ---
-title: "CADMAS-AGENT 영문 매뉴얼 — 멀티에이전트 피난 모델(potential-field·signpost·mob·확률회피) (소스 cross-confirm, Tobler 식 소스전용 적발)"
+title: "CADMAS-AGENT 영문 매뉴얼 — 멀티에이전트 피난 모델(potential-field·signpost·mob·확률회피)" # [11-04 대조 정정]
 model: CADMAS-SURF
 component: manual-notes
 canonical_source: self
-verification_method: "CADMAS-AGENT_Manual_English.pdf(30p, 기계번역) pdftotext. 시스템(p.3)·potential 항법 eq7-1(p.26)·shelter potential -1/r eq7-3(p.27)·mob eq7-4(p.27)·signpost(p.28)·랜덤워크 eq7-5(p.28)·익사 deadline(p.7·18 Table6-2)·CADMAS online/offline data.ma(p.3·9-14)·입출력(p.5-12)·확률회피 §7.4-7.5(p.28-29). 소스 cross-confirm: get_direction.f90·recursive_search_shelter.f90·slope_function.f90:23·update_attribute.f90·random_normal.f90. 적발: Tobler 식 소스전용(매뉴얼 미인쇄)·익사=max_depth(peak)·underwater_function dead-code. printed page+file:line."
+verification_method: "CADMAS-AGENT_Manual_English.pdf(30p, 기계번역) pdftotext. potential 항법·피난소·군중·표지·무작위 각도·익사·CADMAS 결합·입출력·확률회피를 소스와 대조. 2026-11-04 CADMAS-SURF recovery 대조 보고서 반영. PDF 쪽과 인쇄 쪽 구분. KA1 최종 근거의 조건·출력·예시 하이킹 함수 정정." # [11-04 대조 정정]
 citation_status: verified
 has_source_needed: false
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-24
+last_source_check: "2026-11-04 (recovery 대조 반영)"
 related:
   - models/CADMAS-SURF/source-analysis/cadmas-agent-evacuation-simulator.md
 ---
@@ -16,45 +17,103 @@ related:
 
 > 번들 `Simulators/AGENT/Manual/CADMAS-AGENT_Manual_English.pdf`(30p, 기계번역 JP→EN, TOC 북마크 깨짐). 격자기반 멀티에이전트 피난, CADMAS 침수결과 결합. [소스 AGENT 노트](../source-analysis/cadmas-agent-evacuation-simulator.md)와 cross-confirm.
 
-## 1. 모델 개요 (p.3·26)
+## 1. 모델 개요 (AGENT manual p.4·27, 인쇄 p.3·26) [11-04 대조 정정]
 
-CADMAS-SURF 2D 수심·유속을 통신/파일로 받아 피난 시뮬. 이동은 8근방 셀 potential 최소방향(연속좌표, Δt≤dx/v_max eq2-1 p.4). potential 중첩 `U_k=a_{k,1}u_1+a_{k,2}u_2+...`(eq7-1 p.26). 상태(Table6-2 p.18): 0 피난완료·1 이동·2 수중이동·3 사망. → 소스 `get_direction.f90:27-143`(8근방 `pot_total` 최소, 대각 `/√2`).
+CADMAS-SURF의 수심·유속을 통신 또는 파일로 받는다 (`AGENT manual p.4`, 인쇄 p.3). potential 중첩은 `U_k=a_{k,1}u_1+a_{k,2}u_2+...`이다 (`AGENT manual p.27`, 인쇄 p.26). 상태는 0 피난완료·1 이동·2 수중이동·3 사망이다 (`AGENT manual p.19`, 인쇄 p.18). [11-04 대조 정정]
+
+대각 방향 비교는 `pot=(pot_total(n,i,j,ierr)-potnow)/root2+potnow`를 사용한다 (`AGENT/get_direction.f90:95`). 전개한 식은 `U_next/√2+(1−1/√2)U_now`이다. `Δt≤dx/vmax`는 사용자가 지킬 제약이다. AGENT는 이 제약을 자동 검사하지 않는다 (`AGENT manual p.5`, 인쇄 p.4; `AGENT/move_agent.f90:106–107`). 근거는 [KA1-005·510](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
 
 ## 2. 보행 모델
 
-- **사면(hiking)**: 매뉴얼은 개념만, `n_slope` 토글(p.6)만 노출. **Tobler 식 `F=1.191246·exp(-3.5|S+0.05|)` 미인쇄** → 소스 `slope_function.f90:23`만 보유(주석 "sample 함수"=사용자 교체가능). ⚠ **소스전용**
+- **예시 하이킹 함수**: 코드는 `F=1.191246*exp(-3.5d0*abs(S+0.05d0))`를 예시 하이킹 함수라고 부른다 (`AGENT/slope_function.f90:21–23`). 두 영어 문서는 이 식과 Tobler 이름을 적지 않는다. 근거는 [KA1-505](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
 - **수중감속**: 매뉴얼 정성적(status2). 소스 실제경로 `move_agent.f90:59` 선형 `vel·(1−depth/deadline)`. ⚠ 별도 `underwater_function.f90`(수심×유속 표 depth_limit0.7·flow_limit2.5)는 **미호출 dead-code**
-- 기본속도 `agent.inp` Velocity 열(p.7, sample 3.0 m/s)
+- 기본속도는 `agent.inp`의 Velocity 열이다 (`AGENT manual p.8`, 인쇄 p.7; 예시 3.0 m/s). [11-04 대조 정정]
 
-## 3. potential-field 항법 (p.26-28)
+## 3. potential-field 항법 (AGENT manual p.27–29, 인쇄 p.26–28) [11-04 대조 정정]
 
-- **shelter potential** `u=−1/r`(eq7-3 p.27), r=**최단경로거리**(직선 아님). → 소스 `recursive_search_shelter.f90`(8방향 Dijkstra형 완화, 대각 √2, `move_boundary=-1` 차단)
-- **signpost**(p.28): 영향반경 셀 진입 시 확률적으로 표지방향 추종. → `move_agent.f90:65-67`(`theta_signpost` override). `signpost.inp`=i,j,r,θ
-- **mob(군중)** `u=−Σ1/d`(eq7-4 p.27, 반경 r_mob, 자기기여 제외). → `make_potential_mob.f90:54`+`_revise`. 음부호=군중 유인(낮은 potential로 이동)
+- **shelter potential**: 문서 식 (7-3)은 `u=−1/r`이다 (`AGENT manual p.28`, 인쇄 p.27). 코드는 8방향 비용 완화를 재귀 호출한다 (`AGENT/recursive_search_shelter.f90:27–52,56–239`). 시작 셀의 비용이 최소인 피난소의 전체 지도를 그 사람의 지도에 복사한다 (`AGENT/make_n_potential.f90:44–76`). 지도 비용에는 조건에 따라 사면·연직 보정이 포함된다 (`AGENT/make_potential_shelter.f90:70–80,143`). 근거는 [KA1-253·507·508·509](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
+- **signpost**: 초기 사람·표지 쌍마다 준수를 한 번 정한다. 영향반경 셀에서 `theta_signpost` 방향을 적용한다 (`AGENT manual p.29`, 인쇄 p.28; `AGENT/move_agent.f90:65–67`). 근거는 [agent 보고서 §4 KA1-511](../../../_staging/recovery/compare/cadmas-agent-docs-vs-code.md#4-노트-대조와-수정안)이다. [11-04 대조 정정]
+- **mob(군중)**: 문서 식 (7-4)은 음수 역거리 합이다 (`AGENT manual p.28`, 인쇄 p.27). 코드는 셀별 인원 수와 셀 거리를 사용한다. 같은 셀의 분모는 `dxy`이다 (`AGENT/make_potential_mob.f90:47–54`). 근거는 [KA1-256](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
 
-## 4. 익사 판정 (p.7·18)
+## 4. 익사 판정 (AGENT manual p.8·19, 인쇄 p.7·18) [11-04 대조 정정]
 
-매뉴얼: `deadline`=에이전트 허용수심(초과 시 사망), `agent.inp` 5열(p.7, sample 1.0m). **순수 수심임계**(depth×velocity 아님). → 소스 `update_attribute.f90` `max_depth(i,j)>deadline(n)`(:35·56·65). ⚠ **핵심 뉘앙스**: 순간수심 아닌 **`max_depth`(누적 첨두수심, `remesh.f90:195`)** — 물 빠져도 첨두 초과 셀은 사망. 매뉴얼은 "above this depth"로만 기술(첨두 미공개).
+`deadline`은 `agent.inp`의 허용수심 열이다 (`AGENT manual p.8`, 인쇄 p.7). 일반 셀의 상태 갱신은 `if(agent_status(n)==1 .or. agent_status(n)==2)then`에 속한다. `if(depth(i_agent(n),j_agent(n))<=0.0d0) then`과 `elseif(depth(i_agent(n),j_agent(n))<deadline(n)) then`의 각 분기는 최대 수심 초과도 검사한다. 두 조건이 모두 거짓인 `else`에서는 상태 3으로 정한다. 피난소 셀은 그 전에 별도 높이 조건으로 처리한다 (`AGENT/update_attribute.f90:28–94`). 근거는 [KA1-513](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
 
-## 5. CADMAS 결합 (p.3·9-14)
+연직 피난 높이 기준의 혼용은 강한 코드 결함 후보이다 (`AGENT/update_attribute.f90:47`, `AGENT/move_agent.f90:50–51`). 근거는 [KA1-429](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
 
-- **online(MPMD/MPI)**: CADMAS·MA 별도 실행파일 통신(appfile, `mpirun -p4pg`, p.13)
-- **offline(파일)**: CADMAS가 `data.ma`(binary, Fortran unformatted) 작성→독립 read(`&offline`, p.14). 포맷(Table3-2 p.10): 헤더(icmax,jcmax·xc/yc·height) + 시각별 depth_c·uu_c·vv_c(real4)
-- → 소스 `read_cadmas.f90`(MPI path + `cadmas_rank=-1`이 online/offline 스위치)·`remesh.f90`(CADMAS격자→균일 에이전트격자)
+## 5. CADMAS 결합 (AGENT manual p.4·10–15, 인쇄 p.3·9–14) [11-04 대조 정정]
+
+- **online(MPMD/MPI)**: CADMAS·MA는 별도 실행파일로 통신한다 (`appfile`, `mpirun -p4pg`; `AGENT manual p.14`, 인쇄 p.13). [11-04 대조 정정]
+- **offline(파일)**: `data.ma`는 Fortran 순차 비서식 binary이다 (`AGENT/read_cadmas.f90:102`). 헤더는 `icmax,jcmax`·`xc/yc`·`height`를 포함한다 (`AGENT manual p.11`, 인쇄 p.10). [11-04 대조 정정]
+- 원본 격자는 `xc`·`yc`로 나눈 직교 불등간격 격자이다 (`AGENT/m_cadmas.f90:6,24–34`, `AGENT/remesh.f90:52–85`). 근거는 [KA1-512](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
 
 ## 6. 확률 요소
 
-- **랜덤워크** θ=θ_pot+θ_rw, θ_rw~N(0,rw_sigma)(eq7-5 p.28, σ deg p.7). → `random_normal.f90:20-31`(**Box-Muller**), `move_agent.f90:70`
-- 출발시각 `agent_start`(p.7) → `move_agent.f90:32`
+- **랜덤워크**: 무작위 각도의 평균은 0이다. 표준편차는 `rw_sigma`이다 (`AGENT manual p.29`, 인쇄 p.28; `AGENT/random_normal.f90:20–31`). 근거는 [KA1-514](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
+- 출발시각의 `if(time<=agent_start(n)) return`은 이동 루틴 전체를 반환한다 (`AGENT/move_agent.f90:28–43`, `AGENT/solver.f90:83`). 코드 결함 후보는 [KA1-422](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. 근거는 같은 파일의 KA1-503이다. [11-04 대조 정정]
 - 쓰나미 회피: §7.4 도달시간 회피(`flag_danger`, danger.txt; Sakata et al. JSCE B2 76(2) 2020) / §7.5 도달확률 회피(`flag_prob`, ini_prob·relaxation_rate; Ishiyama et al. APAC2023)
 
-## 7. 입출력 (p.5-12)
+## 7. 입출력 (AGENT manual p.6–13, 인쇄 p.5–12) [11-04 대조 정정]
 
-입력: `namelist.inp`(&time·agent·potential·output·offline·flag·danger·prob)·`agent.inp`(N,X0,Y0,Vel,Deadline,rw_sigma,W_signpost,W_shelter,W_mob,agent_start)·`shelter.inp`(N,i,j,z)·`signpost.inp`(N,i,j,r,θ)·`move_boundary.inp`(0=진입/-1=차단)·potential `NNN.txt`·`data.ma`(CADMAS). 출력: `agent.out`(binary 시계열)·`statistics_{i,r}.csv`(피난완료/이동/사망 수)·`debug.txt`. 시각화=CADMAS-VR(agent.out+.grp).
+입력: `namelist.inp`(&time·agent·potential·output·offline·flag·danger·prob)·`agent.inp`(N,X0,Y0,Vel,Deadline,rw_sigma,W_signpost,W_shelter,W_mob,agent_start)·`shelter.inp`(N,i,j,z)·`signpost.inp`(N,i,j,r,θ)·`move_boundary.inp`(0=진입/-1=차단)·potential `NNN.txt`·`data.ma`(CADMAS). 출력은 `agent.out`과 CSV·`debug.txt`이다 (`AGENT manual p.6–13`, 인쇄 p.5–12). [11-04 대조 정정]
+
+`agent_age`와 `agent_height`는 할당·대입 후 고정속성으로 출력한다. 이동 계산에는 사용하지 않는다 (`AGENT/m_agent.f90:95–103`, `AGENT/output.f90:54–57`). 근거는 [KA1-502](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
+
+세 인원 통계는 `statistics_i.csv`의 열이다. `statistics_r.csv`는 `(Null)` 한 칸을 선언하지만 값을 설정하지 않는다 (`AGENT/m_output.f90:34–43,55`, `AGENT/output.f90:82–87,104–105`). 실수 통계 출력은 약한 코드 결함 후보이다. 헤더 장치 번호는 강한 코드 결함 후보이다. 근거는 [KA1-515·425·423](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md)이다. [11-04 대조 정정]
 
 ## 적발 요약
 
-1. **Tobler hiking 식 소스전용**(`slope_function.f90:23`, 매뉴얼 미인쇄, "sample"=교체가능)
-2. **익사=peak depth(`max_depth`)** depth-only(`update_attribute.f90`), 매뉴얼은 첨두 미공개
-3. **underwater_function.f90 dead-code**(미호출), 수심×유속 표 미사용
+1. 예시 하이킹 함수의 식은 두 영어 문서에 없다 (`AGENT/slope_function.f90:21–23`, KA1-505). [11-04 대조 정정]
+2. 일반 셀은 현재 수심과 최대 수심을 분기별로 검사한다 (`AGENT/update_attribute.f90:28–94`, KA1-513). [11-04 대조 정정]
+3. `underwater_function.f90`는 현재 실행 경로에서 호출되지 않는다. 기본 Makefile에도 포함되지 않는다 ([agent 보고서 §4 KA1-506](../../../_staging/recovery/compare/cadmas-agent-docs-vs-code.md#4-노트-대조와-수정안)). [11-04 대조 정정]
 4. **`vertical_evacuation_speed=0.479 m/s`**(`m_agent.f90:43`) 매뉴얼 부재 상수
+
+## 문서와 코드 차이 (11-04 대조)
+
+비교한 판: 코드는 github.com/CADMAS-SURF/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami `da7668f`(2024-08-30, 커밋 1개)의 Simulators/이며, 문서는 `CADMAS-AGENT_Manual_English.pdf`와 `AGENT_Tutorial_English.pdf`이다.
+
+결론 문장은 AI 대조 해석이다. 백틱은 문서·코드 원문이다. 코드 약칭은 해당 시뮬레이터의 Source code/를 기준으로 한다.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| agent:KA1-005 | 시간 간격 제약 | `must be satisfied`<br>`continuous coordinates`<br>`\Delta t\leq\dfrac{dx}{v_{\max}}` | AGENT manual p.5 식 (2-1); `AGENT/move_agent.f90:106–107`; `AGENT/read_condition.f90:25·43–44`<br>`xnext = xnow+u*dt`<br>`ynext = ynow+v*dt`<br>`namelist /time/ start,end,dt,maxstep` | D 문서에만 있음 | `Δt≤dx/vmax`는 사용자가 지킬 제약이다. AGENT는 이 제약을 자동 검사하지 않는다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-011 | 피난소별 비용 읽기 조건 | `Shelter potential data (required when flag_WP=0)` | AGENT manual p.6·7·9·23; `AGENT/make_potential_shelter.f90:27–40`<br>`if(flag_RP==1)then`<br>`else` | B 문서 오기 | 피난소별 비용 파일 읽기 조건은 `flag_RP=1`이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-012 | 피난소별 비용 입력 경로 | `Specify directory in namelist`<br>`0-fill 3-digit ex:000.txt` | AGENT manual p.6·9; `AGENT/make_potential_shelter.f90:29–35`; `AGENT/read_condition.f90:25–32`<br>`do m=1,n_shelter`<br>`write(filename,'(i3.3,".txt")')m`<br>`open(50,file=filename)` | D 문서에만 있음 | 피난소별 비용 입력은 현재 디렉터리의 001.txt부터 읽는다. 입력 디렉터리 옵션은 없다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-015 | 오프라인 입력 장치 | `data.ma Input BINARY 13` | AGENT manual p.6·11; `AGENT/read_cadmas.f90:101–105`; `AGENT/m_cadmas.f90:20–32`<br>`do m=1,n_cadmas`<br>`open(300+m,file=trim(cadfile(m)),status='old',form='unformatted',err=99)` | C 문서 누락 | 오프라인 .ma 파일은 영역별로 장치 301부터 연다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-030 | 표지 한 개의 활성화 | `n_signpost = 2 ! >1:number of signposts 0:not consider` | AGENT manual p.7·9; `AGENT/read_potential.f90:25–27`<br>`if(n_signpost>0)then` | B 문서 오기 | `n_signpost=1`도 표지 입력을 활성화한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-031 | 피난소 한 개의 활성화 | `n_shelter = 2 ! >1:number of shelters 0:not consider` | AGENT manual p.7·8; `AGENT/read_potential.f90:32–34`<br>`if(n_shelter>0)then` | B 문서 오기 | `n_shelter=1`도 피난소 입력을 활성화한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-040 | flag_RP 설명 | `flag_RP = 0`<br>`potential read OnOff flag for shelter 1:wriet 0:not read` | AGENT manual p.7·23; `AGENT/make_potential_shelter.f90:27`<br>`if(flag_RP==1)then` | B 문서 오기 | `flag_RP=1`은 피난소별 비용 읽기이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-052 | agent.inp 열 | `weight coefficient for evacuation route potential (0.0 or more)`<br>`weight coefficients (greater than or equal to 0.0)`<br>`evacuation start time(0.0 or more)` | AGENT manual p.8 그림 3-2; `AGENT/read_agent.f90:58–60`<br>`read(line,*,err=30) nn,agent_xabs,agent_yabs,vel(n),deadline(n) &`<br>`& ,rw_sigma_deg,weight_signpost(n) &`<br>`& ,weight_shelter(n),weight_mob(n),agent_start(n)` | B 문서 오기 | agent.inp는 ID부터 시작 시각까지 10열이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-058 | 침수 확률 척도 | `Probability is between 0 and 1.`<br>`25.00`<br>`28.00`<br>`70.00` | AGENT manual p.10 그림 3-8; `AGENT/make_n_potential.f90:517–518·831–841`<br>`do while (set_prob <= 100)`<br>`set_prob = ini_prob + relaxation_rate*dble(counter)`<br>`if(tsunami_arrival_prob(i_next,j_next) >= set_prob) then` | B 문서 오기 | 침수 확률 파일과 회피 임계값은 코드에서 0–100 척도로 비교한다. 0–1 설명은 그림 예시와 모순이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-061 | 그림 3-6 설명 | `9999.00`<br>`166.79`<br>`Shelter potential data`<br>`A sample of time series tsunami arrival probability` | AGENT manual p.9 그림 3-6; `AGENT/make_potential_shelter.f90:58–62`<br>`write(32,'(1000F10.2)')(m_pot_shelter(n,i,j),i=1,ipmax)` | B 문서 오기 | 그림 3-6은 피난소별 비용 예시이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-063 | 피난자별 비용 쓰기 플래그 | `required when Flag_RPprob=1`<br>`written out with Flag_WP=1` | AGENT manual p.7·10·23; `AGENT/make_potential_shelter.f90:96–118`<br>`if(flag_WPprob == 1)then`<br>`elseif(flag_RPprob == 1) then` | B 문서 오기 | 피난자별 비용 쓰기 플래그는 flag_WPprob이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-064 | 피난자별 비용 파일명 | `0-filled 4-digit number similar to the order of agent.inp`<br>`0001.txt` | AGENT manual p.10 그림 3-9; `AGENT/make_potential_shelter.f90:114–120`<br>`write(filename,'(i5.5)')n`<br>`filename = trim(n_pot_directory) // trim(filename) // "_n_pot.txt"`<br>`open(unit=20000,file=trim(filename),status='old')` | C 문서 누락 | 피난자별 비용 입력명은 00001_n_pot.txt 형식이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-076 | 정수 변동속성 개수 | `N_agent`<br>`N_I_statistics`<br>`N_R_statistics`<br>`N_I_attribute_F`<br>`N_R_attribute_F`<br>`N_I_attribute_FV`<br>`N_R_attribute_V` | AGENT manual p.12·22; `AGENT/output.f90:37–39`<br>`write(14) N_agent,N_I_statistics,N_R_statistics &`<br>`& ,N_I_attribute_F,N_R_attribute_F &`<br>`& ,N_I_attribute_V,N_R_attribute_V` | B 문서 오기 | 출력 헤더의 정수 변동속성 개수 변수는 N_I_attribute_V이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-087 | 셀 수·고정속성 자료형 | `number of x cells`<br>`Fixed number of attributes of integer type` | AGENT manual p.11·12·20·22; `AGENT/m_cadmas.f90:25·91`; `AGENT/m_output.f90:56`<br>`integer:: icmax,jcmax`<br>`real(4):: R_attribute_F(N_R_attribute_F)` | B 문서 오기 | jcmax는 y 셀 수이다. R 고정속성은 실수형이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-095 | 피난소 할당 루틴명 | `allocate_m_pot_shtelte` | AGENT manual p.18; `AGENT/m_potential.f90:228·244`<br>`subroutine allocate_m_pot_shelter(m,ierr)` | B 문서 오기 | 할당 루틴명은 allocate_m_pot_shelter이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-096 | 지역 배열 할당 | `allocate_cadmas_c` | AGENT manual p.18; `AGENT/m_cadmas.f90:39–75`; `AGENT/read_cadmas.f90:42`<br>`subroutine allocate_cadmas_0(ierr)`<br>`subroutine allocate_cadmas_c(m,ierr)` | C 문서 누락 | m_cadmas에는 지역 배열을 할당하는 allocate_cadmas_0도 있다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-097 | 변수 설명 범위 | `module variables are shown in 6.1.1 through 6.1.5 below` | AGENT manual p.18·23; `AGENT/m_flag.f90:1`; `AGENT/m_danger.f90:1`; `AGENT/m_prob.f90:1`<br>`module m_flag`<br>`module m_danger`<br>`module m_prob` | B 문서 오기 | 변수 설명은 §6.1.8까지 이어진다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-098 | 확률 모듈·표 캡션 | `Table 6-6`<br>`defined in m_output`<br>`(m_output)` | AGENT manual p.3·18·23; `AGENT/m_prob.f90:1`<br>`module m_prob` | B 문서 오기 | 확률 모듈은 m_prob이다. p.23의 실제 캡션은 Figure 6-7, Table 6-8, Table 6-9이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-114 | rw_dt 자료형 | `rw_dt`<br>`I`<br>`Progressive uncertainty (rw_theta) update interval` | AGENT manual p.7·19; `AGENT/m_agent.f90:42`<br>`real(8):: rw_dt,rw_tnext` | B 문서 오기 | rw_dt는 real(8)이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-119 | 표지 준수 배열 차원 | `iflag_signpost`<br>`I`<br>`(n_agent,n_signpost)`<br>`Whether or not each agent follows the signposts` | AGENT manual p.19; `AGENT/m_agent.f90:46`; `AGENT/make_signpost.f90:24·35–40`<br>`& ,iflag_signpost(:,:)     &` | C 문서 누락 | iflag_signpost의 차원은 (0:n_signpost,n_agent)이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-145 | 표지 x 인덱스 | `i_signpost`<br>`I`<br>`(n_signpost)`<br>`Location of shelters` | AGENT manual p.9·21; `AGENT/read_signpost.f90:31`; `AGENT/m_potential.f90:45·110`<br>`integer,allocatable:: i_signpost(:),j_signpost(:),narea_signpost(:,:)` | B 문서 오기 | i_signpost는 표지의 x 셀 인덱스이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-146 | 표지 y 인덱스 | `j_signpost`<br>`I`<br>`(n_signpost)`<br>`Refuge location` | AGENT manual p.9·21; `AGENT/read_signpost.f90:31`; `AGENT/m_potential.f90:45·110`<br>`integer,allocatable:: i_signpost(:),j_signpost(:),narea_signpost(:,:)` | B 문서 오기 | j_signpost는 표지의 y 셀 인덱스이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-154 | 피난소별 지도 차원 | `m_pot_shlter`<br>`R`<br>`(ipmax,jpmax)`<br>`Array of potentials for each shelter` | AGENT manual p.21; `AGENT/m_potential.f90:58·228–244`; `AGENT/allocate_potential.f90:65`<br>`real(8),allocatable:: m_pot_shelter(:,:,:)`<br>`allocate(m_pot_shelter(m,ipmax,jpmax),stat=ierror)` | B 문서 오기 | m_pot_shelter의 차원은 (n_shelter,ipmax,jpmax)이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-155 | 피난자별 지도 차원 | `n_potential`<br>`R`<br>`(ipmax,jpmax)`<br>`Evacuee potentials per evacuee array` | AGENT manual p.21; `AGENT/m_potential.f90:59·218`; `AGENT/allocate_potential.f90:60`<br>`real(8),allocatable:: n_potential(:,:,:)`<br>`allocate(n_potential(n,ipmax,jpmax),stat=ierror)` | C 문서 누락 | n_potential의 차원은 (n_agent,ipmax,jpmax)이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-197 | 피난자별 입력 디렉터리 | `n_pot_directory`<br>`C`<br>`Directory of per-evacuee potentials (when required flag_RP=1)` | AGENT manual p.7·10·23; `AGENT/m_prob.f90:7`; `AGENT/make_potential_shelter.f90:114–118`<br>`character(128) n_pot_directory` | B 문서 오기 | n_pot_directory는 `flag_RPprob=1`의 입력 디렉터리이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-219 | 로그 출력 판 차이 | `open_un90`<br>`Open machine number 90 for log output (log_ma)` | AGENT manual p.24; `AGENT/open_file.f90:20–21·28–29`; `AGENT/main.f90:21`<br>`!open(90,file='log_ma',status='replace',form='formatted',err=91)`<br>`!close(90)`<br>`subroutine open_file(iflag,ierr)`<br>`open(100,file="debug.txt",status='replace',form='formatted',err=91)` | A 판 차이 | `AGENT/open_file.f90:20·28`의 주석 처리된 `!open(90,file='log_ma',status='replace',form='formatted',err=91)`와 `!close(90)`은 문서의 이전 로그 동작을 뒷받침한다. 현재 open_file은 장치 100의 debug.txt를 연다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-222 | 정규분포 난수 | `random_normal`<br>`Generate regular random numbers` | AGENT manual p.24·29; `AGENT/random_normal.f90:3·20–31`<br>`subroutine random_normal(sigma,rand_norm,ierr)`<br>`rand_norm=sqrt(-2.0d0*log(r1))*sin(pi2*r2)` | B 문서 오기 | random_normal은 정규분포 난수를 생성한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-238 | 문서에만 있는 거리 루틴 | `allocate_distance_factor`<br>`read_distance_factor` | AGENT manual p.25; Simulators 전체 검색 | D 문서에만 있음 | 공개 시뮬레이터 코드에는 allocate_distance_factor와 read_distance_factor가 없다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-239 | 흐름도 루틴명 | `allocate_pot_mod`<br>`allocate__m_pot_shelter`<br>`allocate_cadms`<br>`recursive_serch_shelter`<br>`make_potential_mod` | AGENT manual p.24–26; `AGENT/allocate_potential.f90:47·65`; `AGENT/read_cadmas.f90:171`; `AGENT/make_potential_shelter.f90:46`; `AGENT/solver.f90:79`<br>`call allocate_pot_mob(ierr)`<br>`call allocate_m_pot_shelter(n_shelter,ierr)`<br>`call allocate_cadmas(ierr)`<br>`call recursive_search_shelter(0.0d0,i_shelter(n),j_shelter(n),ierr)`<br>`call make_potential_mob(ierr)` | B 문서 오기 | 흐름도의 mod·cadms·serch·이중 밑줄 표기는 대응 루틴명의 오기이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-252 | 대각 보정 | `8 meshes around it`<br>`direction with the lowest potential` | AGENT manual p.27; `AGENT/get_direction.f90:29·95–96`<br>`pot=(pot_total(n,i,j,ierr)-potnow)/root2+potnow`<br>`potmin=potnow`<br>`if(pot<potmin)then` | C 문서 누락 | 대각 방향 비교는 `pot=(pot_total(n,i,j,ierr)-potnow)/root2+potnow`를 사용한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-253 | 피난소 지도·보정 조건 | `Minimum distance`<br>`nearest shelter`<br>`not a straight line distance`<br>`u_{shelter}(i,j)=-1/r(i,j)` | AGENT manual p.28 식 (7-3); `AGENT/make_potential_shelter.f90:70–80·143`; `AGENT/make_n_potential.f90:44–76`; `AGENT/recursive_search_shelter.f90:36–41`<br>`if( n_slope==1 ) then`<br>`if(shelter_height(m)>0)then`<br>`m_pot_shelter(m,i,j) = m_pot_shelter(m,i,j)*dxy`<br>`m_pot_shelter(m,i,j) = m_pot_shelter(m,i,j) + vertical_evacuation_time`<br>`n_potential(n,i,j)=-1.0d0/n_potential(n,i,j)`<br>`n_potential(n,i,j) = m_pot_shelter(sort_index(1),i,j)` | C 문서 누락 | 사람별 최단 지도는 시작 셀에서 비용이 최소인 피난소의 전체 지도를 사용한다. 사면 보정은 `if( n_slope==1 ) then`에서 적용한다. `if(shelter_height(m)>0)then`에서는 연직 비용을 더한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-254 | 피난소 셀 포텐셜 | `-10^{10}` | AGENT manual p.28; `AGENT/make_potential_shelter.f90:45·74·79–80·143`<br>`pot_shelter(i_shelter(n),j_shelter(n))=1.0d-10/dxy`<br>`m_pot_shelter(m,i,j) = m_pot_shelter(m,i,j)*dxy`<br>`n_potential(n,i,j)=-1.0d0/n_potential(n,i,j)` | C 문서 누락 | 피난소 셀 -10^10은 연직 비용이 없고 미소 소스값이 보존된 조건에 한정된다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-255 | 미도달 셀 포텐셜 | `-10^{-10}` | AGENT manual p.28; `AGENT/make_potential_shelter.f90:42·78–80·143`<br>`pot_shelter(:,:)=9999d0`<br>`if(m_pot_shelter(m,i,j)/=9999)then`<br>`n_potential(n,i,j)=-1.0d0/n_potential(n,i,j)` | C 문서 누락 | 미도달 셀은 비용 9999를 역수화하므로 포텐셜이 -1/9999이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-256 | 군중 포텐셜 | `u_{mob}(i,j)=-\sum_{k=1}\dfrac{1}{d_k(i,j)}\quad(d_k\leq r_{mob})` | AGENT manual p.28 식 (7-4); `AGENT/make_potential_mob.f90:47–54`<br>`ir2=(ip-i)**2+(jp-j)**2`<br>`if(ir2<=irmob2)then`<br>`if(ir2==0)then`<br>`rr=dxy`<br>`else` | C 문서 누락 | 군중 포텐셜은 셀별 인원 수와 셀 거리를 사용한다. 같은 셀의 분모는 dxy이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-264 | 확률 회피 조건 | `Setting probability is larger than inundation probability`<br>`Set the cell potential to the maximum value.` | AGENT manual p.30 그림 7-2; `AGENT/make_n_potential.f90:841–845`<br>`if(tsunami_arrival_prob(i_next,j_next) >= set_prob) then`<br>`potential(i_next,j_next) = 9999`<br>`EPT = EPT - PT` | C 문서 누락 | 코드는 `if(tsunami_arrival_prob(i_next,j_next) >= set_prob) then`에서 `potential(i_next,j_next) = 9999`로 후보 셀을 차단한다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-403 | 지역별 CADMAS 자료 | (문서에 해당 지역별 자료 구조 설명 없음) | AGENT manual p.20 표 6-3; `AGENT/m_cadmas.f90:24–34·54–66`<br>`type region_data`<br>`type(region_data),allocatable:: region(:)`<br>`if (n_cadmas<=0) then`<br>`!領域がない場合にはダミー領域を1つ作成する`<br>`allocate(region(1),stat=ierror)` | C 문서 누락 | 뜻: 영역이 없으면 더미 영역 하나를 만든다. 표의 CADMAS 변수 일부는 region 구성 요소이다. 코드가 지역별 크기·좌표·시각·rank를 따로 둔다. 초기 icmax·jcmax·시각은 0이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-510 | 대각 보정의 동치 | `U_k=a_{k,1}u_1+a_{k,2}u_2+...`<br>`pot_total`<br>`/√2` | `05fdbedb:models/CADMAS-SURF/source-analysis/cadmas-agent-evacuation-simulator.md:46`; `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-agent-manual.md:21`; `AGENT/get_direction.f90:95`<br>`pot=(pot_total(n,i,j,ierr)-potnow)/root2+potnow` | F 표기 차이 | 원문의 대각 보정은 `pot=(pot_total(n,i,j,ierr)-potnow)/root2+potnow`이다. 이를 전개한 식은 `U_next/√2+(1−1/√2)U_now`이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-513 | 일반 셀 익사 조건 | `deadline`<br>`agent.inp`<br>`update_attribute.f90`<br>`max_depth(i,j)>deadline(n)`<br>`max_depth` | `05fdbedb:models/CADMAS-SURF/source-analysis/cadmas-agent-evacuation-simulator.md:55`; `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-agent-manual.md:37·58`; `AGENT/update_attribute.f90:28–94`<br>`if(agent_status(n)==1 .or. agent_status(n)==2)then`<br>`if(depth(i_agent(n),j_agent(n))<=0.0d0) then`<br>`elseif(depth(i_agent(n),j_agent(n))<deadline(n)) then`<br>`if(max_depth(i_agent(n),j_agent(n))>deadline(n)) then`<br>`else`<br>`agent_status(n)=3      !死亡` | B 문서 오기 | 일반 셀의 상태 갱신은 `if(agent_status(n)==1 .or. agent_status(n)==2)then`에 속한다. `if(depth(i_agent(n),j_agent(n))<=0.0d0) then`과 `elseif(depth(i_agent(n),j_agent(n))<deadline(n)) then`의 각 분기는 최대 수심 초과도 검사한다. 두 조건이 모두 거짓인 else에서는 상태 3으로 정한다. 피난소 셀은 그 전에 별도 높이 조건으로 처리한다. MN의 peak-only 설명은 오기이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-514 | 무작위 각도 표준편차 | (문서 원문 위치는 코드 원문 칸에 인용) | `05fdbedb:models/CADMAS-SURF/source-analysis/cadmas-agent-evacuation-simulator.md:59–60`; `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-agent-manual.md:47`; `AGENT/random_normal.f90:20–31`; AGENT manual p.29<br>`rand_norm=rand_norm*sigma`<br>`standard deviation σ_rw` | F 표기 차이 | 무작위 각도의 평균은 0이고 표준편차는 rw_sigma이다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-515 | CSV 통계 열 | `namelist.inp`<br>`agent.inp`<br>`shelter.inp`<br>`signpost.inp`<br>`move_boundary.inp`<br>`NNN.txt`<br>`data.ma`<br>`agent.out`<br>`statistics_{i,r}.csv`<br>`debug.txt` | `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-agent-manual.md:53`; `AGENT/m_output.f90:34–43·55`; `AGENT/output.f90:82–87·104–105`<br>`& =(/'Number of escaped ','Number of moving  ','Number of dead    '/)`<br>`& ='(Null)'` | B 문서 오기 | 세 인원 통계는 statistics_i.csv의 열이다. statistics_r.csv는 (Null) 한 칸을 선언하지만 값을 설정하지 않는다. 실수 통계 후보 KA1-425와 헤더 장치 후보 KA1-423을 함께 적는다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |
+| agent:KA1-516 | PDF·인쇄 쪽 구별 | `p.3`<br>`p.4`<br>`p.27` | `05fdbedb:models/CADMAS-SURF/manual-notes/cadmas-agent-manual.md:6·19–53`; AGENT manual p.4(인쇄 p.3)·p.28(인쇄 p.27)·p.30(인쇄 p.29) | F 표기 차이 | 본문 인용은 PDF 쪽과 인쇄 쪽을 함께 적는다. [최종 근거](../../../_staging/recovery/compare/CADMAS-SURF-conclusion-verify-KA1.md) |

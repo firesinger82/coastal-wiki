@@ -1,0 +1,21 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D2F/Source code/vf_zgetln.f
+lines: 87
+sha256: a91554eeaefbc9f756cf5e4318afcb574ce596b05fd78ae75878a056ee818d36
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_zgetln.f — 판독 구간 기록
+
+구간은 1행부터 87행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–32 | `VF_ZGETLN`의 줄 판독·단어 분리 규약과 인수·배열을 선언한다(1–31). 공백을 구분자로 사용하고 # 뒤를 주석으로 간주하며 특수문자는 판정하지 않는다고 적는다(5–10). INCLUDE 내부는 판독하지 않았다. 원문(연속 표시는 같은 문장의 이어지는 행이다): `      SUBROUTINE VF_ZGETLN(IS,IE,MWD,NWD,IFIL,IEOF,TEXT)` (1); `CD=== 概要 ===========================================================` (3) (개요 ); `CDT   VF_ZGETLN:テキストデータを1行を読み込み、単語に分解する` (5) (VF_ZGETLN:텍스트 데이터 한 행을 읽고 단어로 분리한다 ); `CD      (1)区切りは1つ以上の空白` (6) ((1)구분자는 하나 이상의 공백 ); `CD      (2)「#」以降はコメント` (7) ((2)# 이후는 주석 ); `CD      (3)n番目の単語は TEXT(IS(n):IE(n)) の形式で参照する` (8) ((3)n번째 단어는 TEXT(IS(n):IE(n)) 형식으로 참조한다 ); `CD      (4)空白行とコメント行はNWD=0` (9) ((4)공백 행과 주석 행은 NWD=0 ); `CD      (5)ダブ等の特殊文字は判定していない(注意)` (10) ((5)탭 등의 특수문자는 판정하지 않는다(주의) ); `C==== 宣言 ===========================================================` (12) (선언 ); `C     -- 大域型 --` (14) (전역 자료형 ); `      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (15); `C     -- 大域変数 --` (17) (전역 변수 ); `      INCLUDE 'VF_A0PRM.h'` (18); `      INCLUDE 'VF_APARAI.h'` (19); `CD    -- 引数 --` (21) (인수 ); `CD    IS(MWD) : OUT : I*4   : n番目の単語の開始位置` (22) (IS(MWD) : OUT : I*4   : n번째 단어 시작 위치 ); `CD    IE(MWD) : OUT : I*4   : n番目の単語の終了位置` (23) (IE(MWD) : OUT : I*4   : n번째 단어 끝 위치 ); `CD    MWD     : IN  : I*4   : 単語の最大数` (24) (MWD     : IN  : I*4   : 최대 단어 수 ); `CD    NWD     : OUT : I*4   : 単語の数` (25) (NWD     : OUT : I*4   : 단어 수 ); `CD    IFIL    : IN  : I*4   : ファイル番号` (26) (IFIL    : IN  : I*4   : 파일 번호 ); `CD    IEOF    : OUT : I*4   : = 0:EOFを読み込んでいない` (27) (IEOF    : OUT : I*4   : = 0:EOF를 읽지 않았다 ); `CD                            !=0:EOFを読み込んだ` (28) (!=0:EOF를 읽었다 ); `CD    TEXT    : OUT : C*(*) : 入力した文字列` (29) (TEXT    : OUT : C*(*) : 입력 문자열 ); `      DIMENSION IS(MWD),IE(MWD)` (30); `      CHARACTER*(*) TEXT` (31). |
+| 33–68 | 시작 시 1행 루틴 안. NWD·IEOF·TEXT를 초기화하고 NC=LEN(TEXT)를 구한다(36–39). MYRANK=0만 READ하며 EOF는 IEOF=1이다(42–48). NPROCS!=1이면 TEXT·IEOF를 VF_P1BCSC·VF_P1BCSI로 방송(broadcast)한다(49–52). 첫 비공백·첫 # 위치를 찾고 공백·주석 행을 건너뛴 뒤 VF_ZSTOWS를 호출한다(57–67). 원문(연속 표시는 같은 문장의 이어지는 행이다): `C==== 実行 ===========================================================` (33) (실행 ); `CD    -- 初期設定 --` (35) (초기 설정 ); `      NWD =0` (36); `      IEOF=0` (37); `      TEXT=' '` (38); `      NC  =LEN(TEXT)` (39); `CD    -- 1行を読み込む --` (41) (한 행을 읽는다 ); `      IF (MYRANK.EQ.0) THEN` (42); `        READ(IFIL,9510,END=100,ERR=9010) TEXT` (43); `        GOTO 110` (44); ` 100    CONTINUE` (45); `        IEOF=1` (46); ` 110    CONTINUE` (47); `      ENDIF` (48); `      IF (NPROCS.NE.1) THEN` (49); `        CALL VF_P1BCSC(TEXT,NC,0)` (50); `        CALL VF_P1BCSI(IEOF, 1,0)` (51); `      ENDIF` (52); `CD    -- 空白行とコメント行はスキップ --` (54) (공백 행과 주석 행은 건너뛴다 ); `      ION=0` (55); `      ICM=0` (56); `      DO 200 I=1,NC` (57); `        IF (ION.EQ.0 .AND. TEXT(I:I).NE.' ') ION=I` (58); `        IF (ICM.EQ.0 .AND. TEXT(I:I).EQ.'#') ICM=I` (59); ` 200  CONTINUE` (60); `      IF (ION.EQ.0  ) GOTO 9000` (61); `      IF (ION.EQ.ICM) GOTO 9000` (62); `CD    -- 有効行を単語に分解 --` (64) (유효 행을 단어로 분리한다 ); `      IF (ICM.EQ.0) ICM=NC+1` (65); `      TEXT=TEXT(ION:ICM-1)` (66); `      CALL VF_ZSTOWS(IS,IE,MWD,NWD,TEXT(1:ICM-ION))` (67). |
+| 69–87 | 시작 시 1행 루틴 안. 정상 종료 레이블과 파일 오류 VF_A2ERR 호출이 있다(70–77). FORMAT(A)를 선언하고 RETURN·END로 닫는다(81–87). 원문(연속 표시는 같은 문장의 이어지는 행이다): `C     -- 実行文の終了 --` (69) (실행문 종료 ); ` 9000 CONTINUE` (70); `      GOTO 9999` (71); `C==== ファイル関連エラー処理 =========================================` (73) (파일 관련 오류 처리 ); ` 9010 CONTINUE` (75); `      CALL VF_A2ERR('VF_ZGETLN','I/O ERROR(text data).')` (76); `      GOTO 9999` (77); `C==== フォーマット文 =================================================` (79) (형식문(format statement) ); ` 9510 FORMAT(A)` (81); `C==== 終了 ===========================================================` (83) (종료 ); ` 9999 CONTINUE` (85); `      RETURN` (86); `      END` (87). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 5–10·57–67: 구분자는 공백 문자 ' '이다. #은 인용부호 상태를 검사하지 않고 첫 위치를 기록한다. 탭 등 특수문자 미판정은 주석에도 명시되어 있다.

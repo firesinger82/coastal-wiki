@@ -1,0 +1,20 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D2F/Source code/vf_bspp.f
+lines: 73
+sha256: ac0337e95642219cfb7fd618c321f98ad94e13ecba111918f02aa0de1584e28c
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_bspp.f — 판독 구간 기록
+
+구간은 1행부터 73행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–31 | VF_BSPP 시작. 일본어 주석 뜻: 개요(3), 기체 셀 압력을 0으로 하고 표면 셀 압력 설정(5), 선언(7), 전역형(9), 전역 변수(12), 인수(17), x·y·z 격자 좌표(18–20), 압력(21), VOF 함수(22), 병렬 버퍼(buffer)(23), 셀 상태 인덱스(24), 실행(30). IMPLICIT·INCLUDE·배열 범위를 적는다. 원문(연속행은 아래 행 번호 순서로 이어지는 한 문장): `      SUBROUTINE VF_BSPP(XX,YY,ZZ,PP,FF,DBUF,NF)` (1)<br>`CD=== 概要 ===========================================================` (3)<br>`CDT   VF_BSPP:気体セルの圧力をゼロとし、表面セルの圧力を設定する` (5)<br>`C==== 宣言 ===========================================================` (7)<br>`C     -- 大域型 --` (9)<br>`      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (10)<br>`C     -- 大域変数 --` (12)<br>`      INCLUDE 'VF_A0PRM.h'` (13)<br>`      INCLUDE 'VF_ANUMBI.h'` (14)<br>`      INCLUDE 'VF_APARAI.h'` (15)<br>`CD    -- 引数 --` (17)<br>`CD    XX(MAXG1,NUMI)    : IN  : R*8 : x方向格子座標等` (18)<br>`CD    YY(MAXG1,NUMJ)    : IN  : R*8 : y方向格子座標等` (19)<br>`CD    ZZ(MAXG1,NUMK)    : IN  : R*8 : z方向格子座標等` (20)<br>`CD    PP(@FOR-3D@)      : I/O : R*8 : 圧力` (21)<br>`CD    FF(@FOR-3D@)      : IN  : R*8 : VOF関数F` (22)<br>`CD    DBUF(NUMBUF*MAXBUF) : OUT :R*8 : 並列用のバッファ` (23)<br>`CD    NF(@FOR-3D@)      : IN  : I*4 : セルの状態を示すインデックス` (24)<br>`      DIMENSION XX(MAXG1,NUMI),YY(MAXG1,NUMJ),ZZ(MAXG1,NUMK)` (25)<br>`      DIMENSION PP  (NUMI,NUMJ,NUMK),FF  (NUMI,NUMJ,NUMK)` (26)<br>`      DIMENSION DBUF(NUMBUF*MAXBUF)` (27)<br>`      DIMENSION NF  (NUMI,NUMJ,NUMK)` (28)<br>`C==== 実行 ===========================================================` (30) |
+| 32–73 | 시작 시 1행 루틴 안. 일본어 주석 뜻: 자유표면 압력(32), 압력 설정(35), 실행문 종료(66), 종료(69). PPS=0이다. 세 격자 루프에서 NF=8 압력을 0으로 두고 NF=5·6·3·4·1·2에 따라 인접 유체 압력과 PPS를 PSI로 보간한다(33–62). 39–59행 NF 분기 사슬에는 ELSE가 없다. 나열한 값 이외의 NF에는 이 분기에서 PP를 대입하지 않는다. 인접 유체 방향의 근거는 같은 디렉터리 `vf_a1main.f`:141–147이다. VF_P3SRD2(PP,DBUF,0) 뒤 반환한다(64–73). 원문(연속행은 아래 행 번호 순서로 이어지는 한 문장): `CD    -- 自由表面の圧力 --` (32)<br>`      PPS=0.0D0` (33)<br>`CD    -- 圧力を設定する --` (35)<br>`      DO 120 K=2,NUMK-1` (36)<br>`        DO 110 J=MYJS,MYJE` (37)<br>`          DO 100 I=MYIS,MYIE` (38)<br>`            IF     (NF(I,J,K).EQ.8) THEN` (39)<br>`              PP(I,J,K)=0.0D0` (40)<br>`            ELSEIF (NF(I,J,K).EQ.5) THEN` (41)<br>`              PSI=ZZ(3,K  )/(0.5D0*ZZ(2,K-1)+FF(I,J,K)*ZZ(2,K))` (42)<br>`              PP(I,J,K)=(1.0D0-PSI)*PP(I,J,K-1)+PSI*PPS` (43)<br>`            ELSEIF (NF(I,J,K).EQ.6) THEN` (44)<br>`              PSI=ZZ(3,K+1)/(0.5D0*ZZ(2,K+1)+FF(I,J,K)*ZZ(2,K))` (45)<br>`              PP(I,J,K)=(1.0D0-PSI)*PP(I,J,K+1)+PSI*PPS` (46)<br>`            ELSEIF (NF(I,J,K).EQ.3) THEN` (47)<br>`              PSI=YY(3,J  )/(0.5D0*YY(2,J-1)+FF(I,J,K)*YY(2,J))` (48)<br>`              PP(I,J,K)=(1.0D0-PSI)*PP(I,J-1,K)+PSI*PPS` (49)<br>`            ELSEIF (NF(I,J,K).EQ.4) THEN` (50)<br>`              PSI=YY(3,J+1)/(0.5D0*YY(2,J+1)+FF(I,J,K)*YY(2,J))` (51)<br>`              PP(I,J,K)=(1.0D0-PSI)*PP(I,J+1,K)+PSI*PPS` (52)<br>`            ELSEIF (NF(I,J,K).EQ.1) THEN` (53)<br>`              PSI=XX(3,I  )/(0.5D0*XX(2,I-1)+FF(I,J,K)*XX(2,I))` (54)<br>`              PP(I,J,K)=(1.0D0-PSI)*PP(I-1,J,K)+PSI*PPS` (55)<br>`            ELSEIF (NF(I,J,K).EQ.2) THEN` (56)<br>`              PSI=XX(3,I+1)/(0.5D0*XX(2,I+1)+FF(I,J,K)*XX(2,I))` (57)<br>`              PP(I,J,K)=(1.0D0-PSI)*PP(I+1,J,K)+PSI*PPS` (58)<br>`            ENDIF` (59)<br>` 100      CONTINUE` (60)<br>` 110    CONTINUE` (61)<br>` 120  CONTINUE` (62)<br>`      CALL VF_P3SRD2(PP,DBUF,0)` (64)<br>`C     -- 実行文の終了 --` (66)<br>`      GOTO 9999` (67)<br>`C==== 終了 ===========================================================` (69)<br>` 9999 CONTINUE` (71)<br>`      RETURN` (72)<br>`      END` (73) [11-04 전수 검증 보완] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 39–59: 압력 변경 분기는 NF=8 및 NF=1:6에만 있다. 나머지 NF의 압력 대입은 없다.

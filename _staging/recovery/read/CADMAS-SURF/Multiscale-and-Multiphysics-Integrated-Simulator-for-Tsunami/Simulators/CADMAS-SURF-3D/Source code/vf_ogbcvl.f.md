@@ -1,0 +1,23 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D/Source code/vf_ogbcvl.f
+lines: 95
+sha256: 3d6331dbb7c0b5ad3f7d457dec8d5013f75ffe044fc57e8780804bef4f498446
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_ogbcvl.f — 판독 구간 기록
+
+구간은 1행부터 95행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–29 | 도화 경곗값 구성 루틴의 형식·포함 파일과 입력·출력 배열을 선언한다. 원문: `      SUBROUTINE VF_OGBCVL(BCVL,WKBC,INDB,NBX,NBY,NBZ)` (1). `CD=== 概要 ===========================================================` (3) (개요). `CDT   VF_OGBCVL:図化用の境界の値を配列に格納する` (5) (도화용 경곗값을 배열에 저장한다). `C==== 宣言 ===========================================================` (7) (선언). `C     -- 大域型 --` (9) (전역 형식). `      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (10). `C     -- 大域変数 --` (12) (전역 변수). `      INCLUDE 'VF_A0PRM.h'` (13). `      INCLUDE 'VF_AFILEI.h'` (14). `      INCLUDE 'VF_ANUMBI.h'` (15). `      INCLUDE 'VF_APARAI.h'` (16). `CD    -- 引数 --` (18) (인수). `CD    BCVL(NUMB)        : IN  : I*4 : 物理量の境界値` (19) (물리량 경곗값). `CD    WKBC(NUMB)        : OUT : I*4 : ワーク配列` (20) (작업 배열). `CD    INDB (MAXB1,NUMB) : IN  : I*4 : 境界面のインデックス` (21) (경계면 인덱스(index)). `CD    NBX               : IN  : I*4 : x方向境界面の数` (22) (x방향 경계면 수). `CD    NBY               : IN  : I*4 : y方向境界面の数` (23) (y방향 경계면 수). `CD    NBZ               : IN  : I*4 : z方向境界面の数` (24) (z방향 경계면 수). `      DIMENSION BCVL(NUMB),WKBC(NUMB)` (25). `      DIMENSION INDB(MAXB1,NUMB)` (26). `C==== 実行 ===========================================================` (28) (실행). |
+| 30–43 | 시작 시 1행 루틴 `SUBROUTINE VF_OGBCVL` 안. 지역 출력 범위와 면별 상한을 설정한다. x,y,z 저장 카운터를 0, NBX, NBX+NBY로 시작한다. 원문: `CD    -- 初期設定 --` (30) (초기 설정). `      I1=MAX(IGRARA(1)-(MYGIS-1),MYIS)` (31). `      J1=MAX(IGRARA(2)-(MYGJS-1),MYJS)` (32). `      K1=IGRARA(3)` (33). `      I2=MIN(IGRARA(4)-(MYGIS-1),MYIE)` (34). `      J2=MIN(IGRARA(5)-(MYGJS-1),MYJE)` (35). `      K2=IGRARA(6)` (36). `      IX=I2+1` (37). `      JY=J2+1` (38). `      KZ=K2+1` (39). `      NX=0` (40). `      NY=NBX` (41). `      NZ=NBX+NBY` (42). |
+| 44–73 | 시작 시 1행 루틴 `SUBROUTINE VF_OGBCVL` 안. 경계 인덱스를 I,J,K로 변환하고 NS=1,2 또는 3,4의 방향별 범위 조건을 검사한다. 조건을 통과한 BCVL(L)을 WKBC의 각 방향 구간에 저장한다. 원문: `CD    -- 数を数える --` (44) (수를 센다). `      DO 100 L=1,NUMB` (45). `        IJK=INDB(1,L)` (46). `        NS =INDB(2,L)` (47). `        K  =(IJK-1)/(NUMI*NUMJ)+1` (48). `        IJK=IJK-NUMI*NUMJ*(K-1)` (49). `        J  =(IJK-1)/NUMI+1` (50). `        I  =IJK-NUMI*(J-1)` (51). `        IF     (NS.EQ.1 .OR. NS.EQ.2) THEN` (52). `          IF (I1.NE.I2) THEN` (53). `            IF (I1.LE.I .AND. I.LE.IX) THEN` (54). `              IF (J1.LE.J .AND. J.LE.J2) THEN` (55). `                IF (K1.LE.K .AND. K.LE.K2) THEN` (56). `                  NX=NX+1` (57). `                  WKBC(NX)=BCVL(L)` (58). `                ENDIF` (59). `              ENDIF` (60). `            ENDIF` (61). `          ENDIF` (62). `        ELSEIF (NS.EQ.3 .OR. NS.EQ.4) THEN` (63). `          IF (J1.NE.J2) THEN` (64). `            IF (I1.LE.I .AND. I.LE.I2) THEN` (65). `              IF (J1.LE.J .AND. J.LE.JY) THEN` (66). `                IF (K1.LE.K .AND. K.LE.K2) THEN` (67). `                  NY=NY+1` (68). `                  WKBC(NY)=BCVL(L)` (69). `                ENDIF` (70). `              ENDIF` (71). `            ENDIF` (72). `          ENDIF` (73). |
+| 74–95 | 시작 시 1행 루틴 `SUBROUTINE VF_OGBCVL`, 45행 DO 루프 100 `DO 100 L=1,NUMB`, 52행 `IF     (NS.EQ.1 .OR. NS.EQ.2) THEN`에서 열린 분기문 안. 이 구간의 74행 ELSE는 앞선 조건과 `ELSEIF (NS.EQ.3 .OR. NS.EQ.4) THEN`이 모두 거짓일 때의 분기이다. 이 IF는 85행 ENDIF에서 닫힌다. L 루프는 86행 레이블 100에서 닫힌다. 나머지 NS는 z면 분기로 처리한다. 해당 방향 두께와 영역 조건을 통과한 BCVL(L)을 저장한 뒤 반환한다. 원문: `        ELSE` (74). `          IF (K1.NE.K2) THEN` (75). `            IF (I1.LE.I .AND. I.LE.I2) THEN` (76). `              IF (J1.LE.J .AND. J.LE.J2) THEN` (77). `                IF (K1.LE.K .AND. K.LE.KZ) THEN` (78). `                  NZ=NZ+1` (79). `                  WKBC(NZ)=BCVL(L)` (80). `                ENDIF` (81). `              ENDIF` (82). `            ENDIF` (83). `          ENDIF` (84). `        ENDIF` (85). ` 100  CONTINUE` (86). `C     -- 実行文の終了 --` (88) (실행문 종료). `      GOTO 9999` (89). `C==== 終了 ===========================================================` (91) (종료). ` 9999 CONTINUE` (93). `      RETURN` (94). `      END` (95). [11-04 전수 검증 보완] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 19–20·10·25: BCVL과 WKBC 인수 설명은 I*4이다. 실제 배열은 DIMENSION과 IMPLICIT DOUBLE PRECISION(A-H,O-Z)에 따라 배정도 실수이다.
+- 52–84: NS=1,2,3,4 이외의 값은 z면 ELSE로 들어간다. 방향별 출력 영역 시작과 끝이 같으면 그 방향 값을 저장하지 않는다.

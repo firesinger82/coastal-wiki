@@ -1,0 +1,23 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D2F/Source code/vf_cwmtb1.f
+lines: 80
+sha256: dfb93f4d1e245c841014d37c077e5c250d5f2ea2ef9489e0388cb27e6caa6f6e
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_cwmtb1.f — 판독 구간 기록
+
+구간은 1행부터 80행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–26 | 행렬 자료(matrix data)의 시간 위상에 대한 수위 보간 루틴과 선언이다(1–23).<br>`      SUBROUTINE VF_CWMTB1(WVT,W1,W2,WVZ,DMTBTT,DMTBHH)` (1).<br>`CD=== 概要 ===========================================================` (3) (개요).<br>`CDT   VF_CWMTB1:マトリクスデータの水位の計算` (5) (VF_CWMTB1:행렬 자료(matrix data)의 수위 계산).<br>`C==== 宣言 ===========================================================` (7) (선언).<br>`C     -- 大域型 --` (9) (전역 형).<br>`      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (10).<br>`C     -- 大域変数 --` (12) (전역 변수).<br>`      INCLUDE 'VF_A0PRM.h'` (13).<br>`      INCLUDE 'VF_AFILEI.h'` (14).<br>`CD    -- 引数 --` (16) (인수).<br>`CD    WVT           : IN  : R*8 : 無次元位相` (17) (WVT           : IN  : R*8 : 무차원 위상).<br>`CD    W1            : OUT : R*8 : 補間の重み(f=W1*f(i)+W2*f(i+1))` (18) (W1            : OUT : R*8 : 보간 가중치(f=W1*f(i)+W2*f(i+1))).<br>`CD    W2            : OUT : R*8 : 補間の重み(f=W1*f(i)+W2*f(i+1))` (19) (W2            : OUT : R*8 : 보간 가중치(f=W1*f(i)+W2*f(i+1))).<br>`CD    WVZ           : OUT : R*8 : 水位変動` (20) (WVZ           : OUT : R*8 : 수위 변동).<br>`CD    DMTBTT(MTBTT) : IN : R*8 : マトリクスデータの無次元位相` (21) (DMTBTT(MTBTT) : IN : R*8 : 행렬 자료(matrix data)의 무차원 위상).<br>`CD    DMTBHH(MTBTT) : IN : R*8 : マトリクスデータの水位` (22) (DMTBHH(MTBTT) : IN : R*8 : 행렬 자료의 수위).<br>`      DIMENSION DMTBTT(MTBTT),DMTBHH(MTBTT)` (23).<br>`C==== 実行 ===========================================================` (25) (실행). |
+| 27–49 | 시작 시 1행 SUBROUTINE VF_CWMTB1 루틴 안. 첫 위상 이하 또는 마지막 위상 이상이면 처음·마지막 구간 끝값 가중치를 쓴다(29–37). 내부 위상은 MTBNOW부터 역순 검색하여 W1/W2를 계산한다(40–49).<br>`CD    -- 位置の検索(全サーチ) --` (27) (위치 검색(전체 탐색)).<br>`      IF (MTBNOW.LE.0) MTBNOW=MTBTT-1` (28).<br>`      IF     (WVT.LE.DMTBTT(1)    ) THEN` (29).<br>`        MTBNOW=1` (30).<br>`        W1=1.0D0` (31).<br>`        W2=0.0D0` (32).<br>`      ELSEIF (WVT.GE.DMTBTT(MTBTT)) THEN` (33).<br>`        MTBNOW=1` (34).<br>`        MTBNOW=MTBTT-1` (35).<br>`        W1=0.0D0` (36).<br>`        W2=1.0D0` (37).<br>`      ELSE` (38).<br>`        IP=0` (39).<br>`        DO 100 I=MTBNOW,1,-1` (40).<br>`          IF (DMTBTT(I).LE.WVT .AND. WVT.LE.DMTBTT(I+1)) THEN` (41).<br>`            IP=I` (42).<br>`            W2=1.0D0/(DMTBTT(I+1)-DMTBTT(I))` (43).<br>`            W1=(DMTBTT(I+1)-WVT)*W2` (44).<br>`            W2=(WVT-DMTBTT(I  ))*W2` (45).<br>`            GOTO 110` (46).<br>`          ENDIF` (47).<br>` 100    CONTINUE` (48).<br>` 110    CONTINUE` (49).<br>40행 `DO 100 I=MTBNOW,1,-1`은 48행에서 닫힌다. 46행 `GOTO 110`은 루프 밖의 49행으로 이동한다. [11-04 전수 검증 정정] |
+| 50–65 | 시작 시 1행 SUBROUTINE VF_CWMTB1 루틴·29행 조건의 38행 분기 안. 첫 검색에서 못 찾으면 나머지 구간을 역순으로 검색한다(50–61). 62행은 `IP.EQ.0`이면 `CALL VF_A2ERR('VF_CWMTB1','P.G ERROR.')`를 실행한다. 다음 실행문은 63행 `MTBNOW=IP`이다. VF_A2ERR 내부의 반환 여부는 이 구간에서 확인하지 않는다.<br>`        IF (IP.EQ.0) THEN` (50).<br>`          DO 200 I=MTBTT-1,MTBNOW+1,-1` (51).<br>`            IF (DMTBTT(I).LE.WVT .AND. WVT.LE.DMTBTT(I+1)) THEN` (52).<br>`              IP=I` (53).<br>`              W2=1.0D0/(DMTBTT(I+1)-DMTBTT(I))` (54).<br>`              W1=(DMTBTT(I+1)-WVT)*W2` (55).<br>`              W2=(WVT-DMTBTT(I  ))*W2` (56).<br>`              GOTO 210` (57).<br>`            ENDIF` (58).<br>` 200      CONTINUE` (59).<br>` 210      CONTINUE` (60).<br>`        ENDIF` (61).<br>`        IF (IP.EQ.0) CALL VF_A2ERR('VF_CWMTB1','P.G ERROR.')` (62).<br>`        MTBNOW=IP` (63).<br>`      ENDIF` (64).<br>바깥 분기 사슬은 29행 `IF     (WVT.LE.DMTBTT(1)    ) THEN`과 33행 `ELSEIF (WVT.GE.DMTBTT(MTBTT)) THEN`에 이어지는 38행 ELSE이다. 따라서 양 끝 비교가 모두 거짓인 경로이다. 전체 IF는 64행에서 닫힌다. 51행 `DO 200 I=MTBTT-1,MTBNOW+1,-1`은 59행에서 닫힌다. 57행 `GOTO 210`의 대상은 60행이다. [11-04 전수 검증 정정] |
+| 66–80 | 시작 시 1행 SUBROUTINE VF_CWMTB1 루틴 안. MTBTYP가 2가 아니면 두 표 수위를 가중 합산한다(67–68). 2이면 WVZ=0이다(69–70).<br>`CD    -- 水位の計算 --` (66) (수위 계산).<br>`      IF (MTBTYP.NE.2) THEN` (67).<br>`        WVZ=W1*DMTBHH(MTBNOW)+W2*DMTBHH(MTBNOW+1)` (68).<br>`      ELSE` (69).<br>`        WVZ=0.0D0` (70).<br>`      ENDIF` (71).<br>`C     -- 実行文の終了 --` (73) (실행문 종료).<br>`      GOTO 9999` (74).<br>`C==== 終了 ===========================================================` (76) (종료).<br>` 9999 CONTINUE` (78).<br>`      RETURN` (79).<br>`      END` (80). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 33–35: `WVT.GE.DMTBTT(MTBTT)` 분기는 MTBNOW=1 직후 MTBNOW=MTBTT-1로 다시 대입한다. [11-04 전수 검증 정정]
+- 43·54: 인접 위상 차의 역수를 계산한다. 이 루틴에는 같은 위상 값이 인접했는지 검사하는 문장이 없다.

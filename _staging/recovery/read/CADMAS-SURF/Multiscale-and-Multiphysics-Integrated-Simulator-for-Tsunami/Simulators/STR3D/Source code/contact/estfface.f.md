@@ -1,0 +1,25 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/STR3D/Source code/contact/estfface.f
+lines: 149
+sha256: f4b51399b30204e3692085e1908c51e21a98f0d6b49e1fd102c3a89c866c8105
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# estfface.f — 판독 구간 기록
+
+구간은 1행부터 149행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–23 | 루틴·암시적 자료형과 인수 및 작업 배열을 선언한다(1–7). ND=4로 세 면 절점과 접촉점 번호를 KN에 넣는다(9–12). DU는 UG(1:3,KN(1:4))에서 U0을 뺀 배열이다(14). VR은 DU(:,4)에서 I=1,2,3의 `RL0(I) * DU(:,I)`를 차례로 뺀 뒤 DT로 나눈 값이다(16–20). VECML2로 AVR을 구한다(22). 해석: UG와 U0을 변위로 보고 DT를 시간 간격으로 보면 VR은 가중 상대 속도이다. 원문: `      SUBROUTINE ESTFFACE(ND,KN,ESTF,NS,IELC,IFCQ,IELQ,U0,RL0,MODE,ISTK` `     &                   ,MODEL,RMU0,AVR0,FN,RKF,UG,DT,IFMDL,MITER0` `     &                   ,IDYN,ITER)` (1–3, 하나의 고정형식 연속문); `      IMPLICIT REAL*8(A-H,O-Z)` (5); `      DIMENSION KN(5),DU(3,4),UG(6,*),U0(3,4),IELC(3),RL0(3),VR(3)` `     &         ,A(3,3),RK(12,12),ESTF(*),TR(12,15),WK(15,12),IELQ(4,*)` (6–7, 하나의 고정형식 연속문); `      ND = 4` (9); `      KN(1:3) = IELC(:)` (11); `      KN(4) = NS` (12); `      DU(:,:) = UG(1:3,KN(1:4)) - U0(:,:)` (14); `      VR(:) = DU(:,4)` (16); `      DO I = 1, 3` (17); `        VR(:) = VR(:) - RL0(I) * DU(:,I)` (18); `      VR(:) = VR(:) / DT` (20); `      CALL VECML2(AVR,VR,3)` (22). [11-04 전수 검증 정정] |
+| 24–84 | 시작 시 1행 ESTFFACE 루틴 안이다. IFMDL=1에서 `AVR / AVR0 < 1.D-10`이면 A를 0으로 초기화하고 대각 성분에 `RMU0 / DASIN(1.D0) * FN / AVR0`를 대입한다(24–32). ELSE는 DATAN 기반 C1·C2·C3으로 A를 구성한다(34–50). IFMDL=2·IDYN=1이면 대각 RKF를 둔다(52–60). 같은 `IFMDL == 2`와 `IDYN == 1` 블록에서 62–63행의 ISTK·MODE·ITER·MITER0·MODEL 조건이 참이면 `RKF * VR(I) * VR(J) / ( AVR * AVR )`를 뺀다(62–71). IFMDL=2·IDYN=0이면 대각 RKF만 둔다(73–81). 바깥 분기를 닫는다(83). 원문: `      IF( IFMDL == 1 ) THEN` (24); `        IF( AVR / AVR0 < 1.D-10 ) THEN` (26); `          A(:,:) = 0.` (28); `          DO I = 1, 3` (30); `            A(I,I) = RMU0 / DASIN(1.D0) * FN / AVR0` (31); `        ELSE` (34); `          C1 = RMU0 / DASIN(1.D0) * FN / AVR` (36); `          C2 = ( 1.D0 / ( 1.D0 + ( AVR / AVR0 ) * ( AVR / AVR0 ) ) /AVR0` `     &           - DATAN( AVR / AVR0 ) / AVR ) / AVR` (37–38, 하나의 고정형식 연속문); `          C3 = DATAN( AVR / AVR0 )` (39); `          DO I = 1, 3` (41); `            DO J = 1, 3` (42); `              A(I,J) = VR(I) * VR(J) * C2` (43); `              IF( I == J ) A(I,J) = A(I,J) + C3` (44); `          A(:,:) = C1 * A(:,:)` (48); `      ELSEIF( IFMDL == 2 ) THEN` (52); `        IF( IDYN == 1 ) THEN` (54); `          A(:,:) = 0.` (56); `          DO I = 1, 3` (58); `            A(I,I) = RKF` (59); `          IF( ( ISTK == 1 .AND. MODE == 2 .AND. ITER <= MITER0 ) .OR.` `     &        ( ISTK == 0 .AND. MODE == 2 .AND. MODEL == 1 ) ) THEN` (62–63, 하나의 고정형식 연속문); `            DO I = 1, 3` (65); `              DO J = 1, 3` (66); `                A(I,J) = A(I,J) -  RKF * VR(I) * VR(J) / ( AVR * AVR )` (67); `        ELSEIF( IDYN == 0 ) THEN` (73); `          A(:,:) = 0.` (75); `          DO I = 1, 3` (77); `            A(I,I) = RKF` (78). [11-04 전수 검증 정정] |
+| 85–123 | 시작 시 1행 ESTFFACE 루틴 안이다. 네 절점의 FI·FJ를 정하여 RK 상부 블록을 조립하고 DT로 나눈다(85–111). 상삼각 성분을 ESTF에 순차 저장한다(113–120). IFCQ=0이면 반환한다(122). 원문: `      DO I = 1, 4` (85); `        IP = 3*(I-1) + 1` (87); `        IF( I == 4 ) THEN` (89); `          FI = 1.D0` (90); `        ELSE` (91); `          FI = -RL0(I)` (92); `        DO J = I, 4` (95); `          JP = 3*(J-1) + 1` (97); `          IF( J == 4 ) THEN` (99); `            FJ = 1.D0` (100); `          ELSE` (101); `            FJ = -RL0(J)` (102); `          RK( IP:IP+2, JP:JP+2 ) = FI * FJ * A(:,:)` (105); `      RK(:,:) = RK(:,:) / DT` (111); `      IP = 0` (113); `      DO I = 1, 12` (115); `        DO J = I, 12` (116); `          IP = IP + 1` (117); `          ESTF(IP) =  RK(I,J)` (118); `      IF( IFCQ == 0 ) RETURN` (122). |
+| 124–149 | 시작 시 1행 ESTFFACE 루틴 안이다. IFCQ=0 반환을 지나온 경로에서 ND=5로 바꾸고 첫 두 절점을 보존한다(124–126). 첫 면 절점의 사각 면 내 위치로 나머지 두 절점을 선택하고 NS를 마지막에 둔다(128–142). TRFACE와 두 MATML 호출로 ESTF를 변환한다(144–147). 루틴을 끝낸다(149). 원문: `      ND = 5` (124); `      KN(1:2) = IELC(1:2)` (126); `      IF( IELC(1) == IELQ(1,IFCQ) ) THEN` (128); `        KN(3)=IELQ(3,IFCQ)` (129); `        KN(4)=IELQ(4,IFCQ)` (130); `      ELSEIF( IELC(1) == IELQ(2,IFCQ) ) THEN` (131); `        KN(3)=IELQ(1,IFCQ)` (132); `        KN(4)=IELQ(4,IFCQ)` (133); `      ELSEIF( IELC(1) == IELQ(3,IFCQ) ) THEN` (134); `        KN(3)=IELQ(1,IFCQ)` (135); `        KN(4)=IELQ(2,IFCQ)` (136); `      ELSEIF( IELC(1) == IELQ(4,IFCQ) ) THEN` (137); `        KN(3)=IELQ(2,IFCQ)` (138); `        KN(4)=IELQ(3,IFCQ)` (139); `      KN(5) = NS` (142); `      CALL TRFACE(TR)` (144); `      CALL MATML(WK,2,TR,3,ESTF,1,15,12,12)` (146); `      CALL MATML(ESTF,1,WK,2,TR,2,15,15,12)` (147). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 20·26–39·67·111: DT·AVR0·AVR을 분모로 쓰며 67행 계산 앞에는 AVR의 0 여부 검사가 없다.
+- 24–83: IFMDL이 1·2 이외이거나 IFMDL=2에서 IDYN이 0·1 이외이면 A를 설정하는 분기가 없다.
+- 85–111: RK의 아래쪽 비대각 블록을 대입하는 문장은 없으며 111행은 RK 전체를 DT로 나눈다. ESTF 저장은 상삼각 성분만 읽는다(115–120).
+- 128–140: IELC(1)이 IELQ의 네 절점과 모두 다를 때 KN(3:4)를 지정하는 ELSE가 없다.

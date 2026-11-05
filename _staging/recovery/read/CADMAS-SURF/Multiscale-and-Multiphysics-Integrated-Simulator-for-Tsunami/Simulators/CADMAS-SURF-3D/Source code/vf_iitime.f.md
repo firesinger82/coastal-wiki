@@ -1,0 +1,21 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D/Source code/vf_iitime.f
+lines: 74
+sha256: 225623841819a3e258233468454e6aa5992b86d2d790774501080a4744e09f8f
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_iitime.f — 판독 구간 기록
+
+구간은 1행부터 74행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–29 | TIME 입력의 선언과 단어 수 검사(1–28). `      SUBROUTINE VF_IITIME(IS,IE,NWD,TEXT)` (1) (원문) `CD=== 概要 ===========================================================` (3) (주석 뜻: 개요) `CDT   VF_IITIME:時間制御データ(TIME)を解釈する` (5) (주석 뜻: VF_IITIME: 시간 제어 자료(TIME)를 해석한다) `C==== 宣言 ===========================================================` (7) (주석 뜻: 선언) `C     -- 大域型 --` (9) (주석 뜻: 전역형) `      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (10) (원문) `C     -- 大域変数 --` (12) (주석 뜻: 전역 변수) `      INCLUDE 'VF_A0PRM.h'` (13) (원문) `      INCLUDE 'VF_ATIMEI.h'` (14) (원문) `      INCLUDE 'VF_ATIMER.h'` (15) (원문) `CD    -- 引数 --` (17) (주석 뜻: 인수) `CD    IS(MAXWDS) : IN  : I*4   : n番目の単語の開始位置` (18) (주석 뜻: n번째 단어 시작 위치) `CD    IE(MAXWDS) : IN  : I*4   : n番目の単語の終了位置` (19) (주석 뜻: n번째 단어 끝 위치) `CD    NWD        : IN  : I*4   : 単語の数` (20) (주석 뜻: 단어 수) `CD    TEXT       : IN  : C*(*) : 入力した文字列` (21) (주석 뜻: 입력 문자열) `      DIMENSION IS(MAXWDS),IE(MAXWDS)` (22) (원문) `      CHARACTER*(MAXCHR) TEXT` (23) (원문) `C==== 実行 ===========================================================` (25) (주석 뜻: 실행) `CD    -- 単語数のチェック --` (27) (주석 뜻: 단어 수 검사) `      IF (NWD.LT.2) CALL VF_A2ERR('VF_IITIME','SYNTAX ERROR.')` (28) (원문) [11-04 전수 검증 정정] |
+| 30–53 | 시작 시 1행 VF_IITIME 루틴 안. CONST는 DTCNST>=ZERO와 IDTTYP=0을 설정한다(31–35). AUTO는 DTINIT·DTSAFE>=ZERO와 IDTTYP=1이다(38–44). LIMIT는 DTMIN>=ZERO이며 DTMIN<=DTMAX를 요구한다(47–52). `CD    -- TIME CONSTを解釈する --` (30) (주석 뜻: TIME CONST를 해석한다) `      IF (TEXT(IS(2):IE(2)).EQ.'CONST') THEN` (31) (원문) `        IF (NWD.LT.3) CALL VF_A2ERR('VF_IITIME','SYNTAX ERROR.')` (32) (원문) `        CALL VF_ZSTOR(DTCNST,TEXT(IS(3):IE(3)))` (33) (원문) `        IF (DTCNST.LT.ZERO) CALL VF_A2ERR('VF_IITIME','INVALID VALUE.')` (34) (원문) `        IDTTYP=0` (35) (원문) `CD    -- TIME AUTOを解釈する --` (37) (주석 뜻: TIME AUTO를 해석한다) `      ELSEIF (TEXT(IS(2):IE(2)).EQ.'AUTO') THEN` (38) (원문) `        IF (NWD.LT.4) CALL VF_A2ERR('VF_IITIME','SYNTAX ERROR.')` (39) (원문) `        CALL VF_ZSTOR(DTINIT,TEXT(IS(3):IE(3)))` (40) (원문) `        CALL VF_ZSTOR(DTSAFE,TEXT(IS(4):IE(4)))` (41) (원문) `        IF (DTINIT.LT.ZERO) CALL VF_A2ERR('VF_IITIME','INVALID VALUE.')` (42) (원문) `        IF (DTSAFE.LT.ZERO) CALL VF_A2ERR('VF_IITIME','INVALID VALUE.')` (43) (원문) `        IDTTYP=1` (44) (원문) `CD    -- TIME LIMITを解釈する --` (46) (주석 뜻: TIME LIMIT를 해석한다) `      ELSEIF (TEXT(IS(2):IE(2)).EQ.'LIMIT') THEN` (47) (원문) `        IF (NWD.LT.4) CALL VF_A2ERR('VF_IITIME','SYNTAX ERROR.')` (48) (원문) `        CALL VF_ZSTOR(DTMIN,TEXT(IS(3):IE(3)))` (49) (원문) `        CALL VF_ZSTOR(DTMAX,TEXT(IS(4):IE(4)))` (50) (원문) `        IF (DTMIN.LT.ZERO ) CALL VF_A2ERR('VF_IITIME','INVALID VALUE.')` (51) (원문) `        IF (DTMIN.GT.DTMAX) CALL VF_A2ERR('VF_IITIME','INVALID VALUE.')` (52) (원문) |
+| 54–74 | 시작 시 1행 VF_IITIME 루틴, 31행 IF 분기문(47행 ELSE IF 분기) 안. END는 비음수 NEND·TEND를 읽는다(55–60). 미지원 단어 오류와 종료부를 포함한다. `CD    -- TIME ENDを解釈する --` (54) (주석 뜻: TIME END를 해석한다) `      ELSEIF (TEXT(IS(2):IE(2)).EQ.'END') THEN` (55) (원문) `        IF (NWD.LT.4) CALL VF_A2ERR('VF_IITIME','SYNTAX.')` (56) (원문) `        CALL VF_ZSTOI(NEND,TEXT(IS(3):IE(3)))` (57) (원문) `        CALL VF_ZSTOR(TEND,TEXT(IS(4):IE(4)))` (58) (원문) `        IF (NEND.LT.0    ) CALL VF_A2ERR('VF_IITIME','INVALID VALUE.')` (59) (원문) `        IF (TEND.LT.0.0D0) CALL VF_A2ERR('VF_IITIME','INVALID VALUE.')` (60) (원문) `CD    -- 解釈できない単語によるエラー --` (62) (주석 뜻: 해석할 수 없는 단어 오류) `      ELSE` (63) (원문) `        CALL VF_A2ERR('VF_IITIME','UNKNOWN WORD.')` (64) (원문) `      ENDIF` (65) (원문) `C     -- 実行文の終了 --` (67) (주석 뜻: 실행문 종료) `      GOTO 9999` (68) (원문) `C==== 終了 ===========================================================` (70) (주석 뜻: 종료) ` 9999 CONTINUE` (72) (원문) `      RETURN` (73) (원문) `      END` (74) (원문) 바깥 31행 `IF (TEXT(IS(2):IE(2)).EQ.'CONST') THEN`은 65행에서 닫힌다. 직전 분기는 47행 `ELSEIF (TEXT(IS(2):IE(2)).EQ.'LIMIT') THEN`이다. [11-04 전수 검증 보완] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 40–43: AUTO의 DTSAFE는 ZERO 미만만 거부한다. 이 분기에는 DTSAFE의 상한 검사가 없다.

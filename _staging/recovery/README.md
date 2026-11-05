@@ -289,6 +289,24 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 노트 표본(sonnet 30줄, `flow/Celeris-notes-sample.md`): 맞음 29, 부분 1, 틀림 0. 부분 1줄(`celeris-boussinesq-solver.md:125` 인용 없음)과 표본 밖 1줄(CP1-033·034 코드 칸이 인용 대신 설명)을 Claude가 고쳤다(`[11-04 표본 검증 보완]`).
 - validate-all: G8b 1건을 고쳐 통과했다. Tavakkol 2017 Fig. 2의 입력 예시 Windows 경로 인용을 `<logPath>…</logPath>`로 줄였다.
 
+## CADMAS-SURF 판독·대조·노트 반영 (2026-11-04, 추가 줄 전수 대조 중단)
+
+기록: `read/CADMAS-SURF/`(코드·매뉴얼·튜토리얼), 전수 검증 `read/CADMAS-SURF/verify/`. 원자료: `models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/`(3D, 3D2F, STR3D, AGENT; git 커밋 `da7668f` 2024-08-30 하나뿐). 대상 목록: `scripts/cadmas-batches.json`, `scripts/cadmas-docbatches.json`, `scripts/cadmas-pdfjobs.json`. 3D와 글자가 같은 3D2F 파일 목록은 `scripts/cadmas-3d2f-identical-to-3d.txt`다. Codex effort는 11-04 사용자 지시로 high다.
+
+- 판독(Codex `gpt-6.1-sol`): 기계 확인을 통과했다. 코드 기록 337개가 구간·sha·행 수 검사를 통과했다. 원문 인용 84,582개와 14,877개를 대조했다. 불일치 1개(`GOTO 330`을 "(35·44)"로 적은 것)는 검사기 오판이다.
+- PDF 쪽 검사: 32쪽 중 26쪽이 통과했다. 나머지 6쪽을 Claude가 쪽 이미지로 확인했다. 3D manual p.66은 기록을 전각 콜론 원문(`CNS：Not changed after preprocessing`, `TRN：Changed after preprocessing`)으로 고쳤다. AGENT p.25는 루틴 이름 표로 이미지와 맞다. STR p.110·p.111은 식만 있는 쪽이다. STOC p.8은 「」 인용이다. 나머지 2쪽은 두 단 배치에서 생긴 검사기 오판이다.
+- 표본(sonnet 28행, `flow/CADMAS-SURF-read-sample.md`): 맞음 27, 부분 1, 틀림 0. 부분이 있어 전수 의미 검증(`gpt-6-astra` 63작업, `read/CADMAS-SURF/verify/`)을 했다.
+- 대조 보고서(Codex `gpt-6.1-sol`): `compare/cadmas-*.md` 11개(3D·2F 매뉴얼 이론·프로그램·입력, STR 이론·자료표, AGENT, 튜토리얼·빌드, 3D2F 대 3D 사본), 흐름 분석 `flow/CADMAS-SURF-callflow.md`(결론 21행, 흐름도 3개). 흐름도 3개를 mmdc로 렌더했다. 표시된 상자 10개를 원문과 대조했고 고칠 것은 없었다(`## Claude 렌더 확인 (11-04)`).
+- 판 판정(`compare/CADMAS-SURF-version-verify-{E1,E2,E3,AD1..AD5}.md`, `gpt-6-astra`): git 이력이 없으므로 날짜 표지 주석(`2011.04 start/end` 192곳, `2012.03`, `2016.09`, `2017.03.ohki`), 수정자 표지(`CAKIY` 등), 3D·3D2F 사본 차이, 영어판·일본어판 매뉴얼 차이를 판 근거로 썼다.
+- 외부 원문(`compare/CADMAS-SURF-external-sources.md`, sonnet): KS1-241..244·271·450은 A다. 매뉴얼 p.269가 식 (3.29)를 선형, (3.30)을 면적 보간으로 정의하고 코드 주석은 `CAKIY ? 線形補間`이다. KT1-747·748은 H다(문서가 참고문헌만 인용).
+- 결론 전수 재검증(`compare/CADMAS-SURF-conclusion-verify-*.md` 18개, `gpt-6-astra`).
+- 최종 결론(`assign/CADMAS-SURF-final-conclusions.tsv`, 2,341행): A 679, B 411, C 755, D 10, E 98, F 144, H 229, 일치 15. G와 X는 0이다. 보고서 결론 대비 673행이 바뀌었다. 가장 많은 것은 C→A 454행이다(KD1 339, KS2 109).
+- 노트 반영(Codex `gpt-6.1-sol` 16작업, `flow/CADMAS-SURF-notes-apply-{1..16}.md`, 반영 전 커밋 `05fdbedb`): 2,097행을 노트 28개에 넣었다. 새 파일은 `source-analysis/cadmas-3d2f-vs-3d-{io-mpi,coupling,physics}-differences.md`, `manual-notes/cadmas-{str,surf3d,2f}-manual-differences.md`, `manual-notes/cadmas-tutorials-build-differences.md`다. Claude가 2,097행 전부가 지정 노트 표에 한 번씩 있는지 행 ID로 대조했다(누락 0, 중복 0, 다른 노트 0). 처음에는 4행(KU1-013·017·024·033)이 카탈로그 노트에 문단으로 들어가 있었고, Claude가 같은 표 형식으로 바꿨다. 아키텍처 소스맵 노트의 흐름도 3개는 렌더 확인본과 글자가 같고 다시 렌더했다.
+- 추가 줄 코드 인용 기계 대조(`scripts/cadmas-resume/cc_cad.py`, 경로 바로 뒤 인용만): 4,925개 중 4,649개 일치, 276개 불일치. 표본을 보면 대부분 여러 위치를 나열한 뒤 인용을 이어 붙인 형식에서 생긴 검사기 오판이다. 실제로 틀린 인용도 있다(예: `3D2F/vf_a2dflt.f:226` 한 위치 뒤에 다른 곳의 코드 다섯 줄).
+- **중단:** 추가 줄 전수 대조(`gpt-6-astra` 21작업)는 11-04 12:15 시작 직후 Codex 사용 한도(주간, 재사용 11-11 07:54)로 멈췄다. 진행 기록 6개(`flow/CADMAS-SURF-notes-verify-{1,3,5,7,9,11}.md`)는 앞부분만 있다. 노트 안의 검증 정정 표시는 `cadmas-str-manual-differences.md`의 1곳이다. 따라서 이번 커밋의 노트 추가 줄은 아직 전수 대조를 거치지 않았다.
+- 재개 방법: `scripts/cadmas-resume/`에 작업 지시문 21개, 묶음 목록 4개, 실행 스크립트, 인용 검사기, 기계 불일치 후보(`cc_cadadd.out`)를 두었다. 새 scratchpad를 `S`로 정하고 `S=… bash scripts/cadmas-resume/cadpages.sh`로 쪽 이미지를 다시 만든 뒤 `S=… bash scripts/cadmas-resume/cadnvrun.sh`를 실행한다. 지시문에 "기록이 이미 있으면 끝난 부분은 건너뛴다"가 있다. 그 뒤 순서: 기계 재확인, sonnet 노트 표본, validate-all, 대시보드, 커밋.
+- `extract/CADMAS-SURF`(37 MB, 일본어 매뉴얼 텍스트 `pdf-jp/` 포함)는 커밋하지 않았다. 작업 지시문이 이 경로를 읽으므로 이 PC에 둔다.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
@@ -303,4 +321,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 10-14 완료, SWASH 10-15 완료, FUNWAVE 10-18 완료, LISFLOOD-FP 10-21 완료, Celeris 11-04 완료, CADMAS-SURF 진행 중, Delft3D 미착수(범위 미정)): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 10-14 완료, SWASH 10-15 완료, FUNWAVE 10-18 완료, LISFLOOD-FP 10-21 완료, Celeris 11-04 완료, CADMAS-SURF 노트 반영까지 완료·추가 줄 전수 대조는 Codex 한도로 중단(11-11 이후 `scripts/cadmas-resume/`로 재개), Delft3D 미착수(범위 미정: 전체 또는 연안 핵심, `read/Delft3D/`의 부분 기록 60개는 재시작 때 지운다)): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

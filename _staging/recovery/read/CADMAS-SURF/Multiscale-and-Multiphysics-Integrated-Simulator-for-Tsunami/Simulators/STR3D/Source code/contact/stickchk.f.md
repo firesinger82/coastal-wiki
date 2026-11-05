@@ -1,0 +1,23 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/STR3D/Source code/contact/stickchk.f
+lines: 99
+sha256: 6614e868d7f5de073c41915f9ab64169516dd372422d249647d9bfd66c6cc094
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# stickchk.f — 판독 구간 기록
+
+구간은 1행부터 99행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–21 | STICKCHK는 고착·미끄럼(stick-slip) 상태를 물체 쌍별로 갱신한다. IDYN=1이며 ICONV2=1 또는 ITER2=MAXITER2이면 특정 면(face) 접촉 수 NMD1을 센다(8–15). 양수이면 모델 변경 진단 문구를 출력한다(17–18). 인수·배열 선언과 빈 줄을 포함한다. 원문: 연속문(1–2): `      SUBROUTINE STICKCHK(IFRIC,ISTK,NBDY,NINDC,ICBD,INDA,ISLV,ISLVO` (1); `     &                   ,FRIC,EPS,ITER2,MAXITER2,ICONV2,IDYN,ITO)` (2). `      IMPLICIT REAL*8(A-H,O-Z)` (4). 연속문(5–6): `      DIMENSION ISTK(NBDY,NBDY,2),INDA(NBDY),ICBD(NBDY),ISLV(2,NINDC)` (5); `     &         ,ISLVO(2,NINDC),IFRIC(10,NINDC),FRIC(10,NINDC)` (6). `      IF( IDYN == 1 .AND. ( ICONV2 == 1 .OR. ITER2 == MAXITER2 ) ) THEN` (8). `        NMD1 = 0` (10). `        DO I = 1, NINDC` (12). 연속문(13–14): `          IF( ISLV(1,I) == 3 .AND. IFRIC(3,I) == 0 .AND.` (13); `     &        IFRIC(2,I) /= 2 ) NMD1 = NMD1 + 1` (14). `        ENDDO` (15). 연속문(17–18): `        IF( NMD1 > 0 ) WRITE(ITO,'(/A,I5)')` (17); `     &    '   * FRICTION MODEL CHANGED : STICK-SLIP ---> BILINEAR',NMD1` (18). `      ENDIF` (20). |
+| 22–45 | 시작 시 1–2행 STICKCHK 루틴 안. IDYN의 SELECT CASE 중 CASE(1)은 ISTK(:,:,1)을 0으로 초기화한다(22–25). IFRIC(3)=1이고 IFRIC(2)/=2인 접촉의 물체 쌍을 1로 설정한다(27–33). ITER2=1이면 이전 ISLVO=3 여부를 IFRIC(4)에 저장하며 현재 ISLV가 3이 아니게 된 항은 0으로 바꾼다(35–44). 원문: `      SELECT CASE( IDYN )` (22). `      CASE( 1 )` (23). `        ISTK(:,:,1) = 0` (25). `        DO I = 1, NINDC` (27). `          IF( IFRIC(3,I) == 1 .AND. IFRIC(2,I) /= 2 ) THEN` (28). `            IBDY = IFRIC(5,I)` (29). `            JBDY = IFRIC(6,I)` (30). `            ISTK(IBDY,JBDY,1) = 1` (31). `          ENDIF` (32). `        ENDDO` (33). `        IF( ITER2 == 1 ) THEN` (35). `          IFRIC(4,:) = 0` (36). `          DO I = 1, NINDC` (37). `            IF( ISLVO(1,I) == 3 ) IFRIC(4,I) = 1` (38). `          ENDDO` (39). `        ENDIF` (40). `        DO I = 1, NINDC` (42). `          IF( IFRIC(4,I) == 1 .AND. ISLV(1,I) /= 3 ) IFRIC(4,I) = 0` (43). `        ENDDO` (44). |
+| 46–72 | 시작 시 1–2행 STICKCHK 루틴·22행 `SELECT CASE( IDYN )`의 23행 `CASE( 1 )` 안. 이 SELECT는 97행 `END SELECT`에서 닫힌다. ICONV2=1 또는 ITER2=MAXITER2이면 ADDSET4로 물체별 접촉·면 범위를 얻는다(46–55). 이전 ISTK(:,:,2)=1인 쌍은 건너뛴다(51). 유지된 면 접촉이 상대 물체 범위에 있으면 FRIC(5)<=EPS 여부로 ISTK를 1 또는 0으로 정하며 실패 시 다음 물체 쌍으로 간다(56–67). 결과를 ISTK(:,:,2)에 복사한다(69). 원문: `        IF( ICONV2 == 1 .OR. ITER2 == MAXITER2 ) THEN` (46). `          DO IBDY = 1, NBDY` (48). `            CALL ADDSET4(IS,IE,INDA,IBDY)` (49). `            DO JBDY = 1, NBDY` (50). `              IF( ISTK(IBDY,JBDY,2) == 1 ) CYCLE` (51). `              DO I = IS, IE` (52). `                IF( IFRIC(4,I) == 1 ) THEN` (53). `                  MA = ISLV(2,I)` (54). `                  CALL ADDSET4(JS,JE,ICBD,JBDY)` (55). `                  IF( MA >= JS .AND. MA <= JE ) THEN` (56). `                    IF( FRIC(5,I) <= EPS ) THEN` (57). `                      ISTK(IBDY,JBDY,1) = 1` (58). `                    ELSE` (59). `                      ISTK(IBDY,JBDY,1) = 0` (60). `                      GOTO 10` (61). `                    ENDIF` (62). `                  ENDIF` (63). `                ENDIF` (64). `              ENDDO` (65). `   10       ENDDO` (66). `          ENDDO` (67). `          ISTK(:,:,2) = ISTK(:,:,1)` (69). `        ENDIF` (71). [11-04 전수 검증 보완] |
+| 73–99 | 시작 시 1–2행 STICKCHK 루틴·22행 `SELECT CASE( IDYN )`의 23행 `CASE( 1 )` 안. 이 SELECT는 97행 `END SELECT`에서 닫힌다. IFRIC(3)을 0으로 지운 뒤 ISLV=3 또는 13인 면 접촉에 물체 쌍의 ISTK를 복사한다(73–81). CASE(0)은 IFRIC(3,:)를 0으로 지운다(83–85). ICONV2=1 또는 ITER2=MAXITER2이면 ISTK(:,:,2)의 전체 원소를 1로 설정한다(87–89). 같은 조건에서 ISLV(1,I)=3인 항의 IFRIC(3,I)를 1로 설정한다(91–93). SELECT 종료와 END를 포함한다. 원문: `        IFRIC(3,:) = 0` (73). `        DO I = 1, NINDC` (75). `          IF( ISLV(1,I) == 3 .OR. ISLV(1,I) == 13 ) THEN` (76). `            IBDY = IFRIC(5,I)` (77). `            JBDY = IFRIC(6,I)` (78). `            IFRIC(3,I) = ISTK(IBDY,JBDY,1)` (79). `          ENDIF` (80). `        ENDDO` (81). `      CASE( 0 )` (83). `        IFRIC(3,:) = 0` (85). `        IF( ICONV2 == 1 .OR. ITER2 == MAXITER2 ) THEN` (87). `          ISTK(:,:,2) = 1` (89). `          DO I = 1, NINDC` (91). `            IF( ISLV(1,I) == 3 ) IFRIC(3,I) = 1` (92). `          ENDDO` (93). `        ENDIF` (95). `      END SELECT` (97). `      END` (99). [11-04 전수 검증 정정] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 17–18: 모델 변경 문구를 출력하는 블록에는 IFRIC나 FRIC를 변경하는 대입이 없다.
+- 22–97: IDYN의 CASE는 1과 0뿐이며 CASE DEFAULT가 없다.

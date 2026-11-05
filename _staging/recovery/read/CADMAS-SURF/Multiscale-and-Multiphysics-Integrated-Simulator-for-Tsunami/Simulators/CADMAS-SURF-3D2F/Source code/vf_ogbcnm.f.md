@@ -1,0 +1,21 @@
+---
+file: models/CADMAS-SURF/raw/source_code/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami/Simulators/CADMAS-SURF-3D2F/Source code/vf_ogbcnm.f
+lines: 96
+sha256: d5bfe2e0b59692503815695c4b8d31a0a883444a6fa0f0d740f1b55a99723d57
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# vf_ogbcnm.f — 판독 구간 기록
+
+구간은 1행부터 96행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–43 | 도화(graphics) 경계 수를 세는 VF_OGBCNM의 개요·대역형·대역변수·인수 선언이다(5–24). INDB는 경계면 지표, NBX·NBY·NBZ는 방향별 출력 경계 수다(20–23). 초기 설정으로 지역 출력영역·방향별 끝면·카운터를 설정한다(28–40). ICPL 또는 ISTM 조건에 해당하면 0인 카운터를 그대로 반환한다(42). 원문: `      SUBROUTINE VF_OGBCNM(INDB,NBX,NBY,NBZ)` (1) / `CD=== 概要 ===========================================================` (개요) (3) / `CDT   VF_OGBCNM:図化用の境界の数を数える` (도화용 경계 수를 셈) (5) / `C==== 宣言 ===========================================================` (선언) (7) / `C     -- 大域型 --` (대역형) (9) / `      IMPLICIT INTEGER(I-N),DOUBLE PRECISION(A-H,O-Z)` (10) / `C     -- 大域変数 --` (대역변수) (12) / `      INCLUDE 'VF_A0PRM.h'` (13) / `      INCLUDE 'VF_AFILEI.h'` (14) / `      INCLUDE 'VF_ANUMBI.h'` (15) / `      INCLUDE 'VF_APARAI.h'` (16) / `      INCLUDE 'SF_STRUCT.h'` (17) / `CD    -- 引数 --` (인수) (19) / `CD    INDB (MAXB1,NUMB) : IN  : I*4 : 境界面のインデックス` (경계면 지표) (20) / `CD    NBX               : OUT : I*4 : x方向境界面の数` (x 방향 경계면 수) (21) / `CD    NBY               : OUT : I*4 : y方向境界面の数` (y 방향 경계면 수) (22) / `CD    NBZ               : OUT : I*4 : z方向境界面の数` (z 방향 경계면 수) (23) / `      DIMENSION INDB(MAXB1,NUMB)` (24) / `C==== 実行 ===========================================================` (실행) (26) / `CD    -- 初期設定 --` (초기 설정) (28) / `      I1=MAX(IGRARA(1)-(MYGIS-1),MYIS)` (29) / `      J1=MAX(IGRARA(2)-(MYGJS-1),MYJS)` (30) / `      K1=IGRARA(3)` (31) / `      I2=MIN(IGRARA(4)-(MYGIS-1),MYIE)` (32) / `      J2=MIN(IGRARA(5)-(MYGJS-1),MYJE)` (33) / `      K2=IGRARA(6)` (34) / `      IX=I2+1` (35) / `      JY=J2+1` (36) / `      KZ=K2+1` (37) / `      NBX=0` (38) / `      NBY=0` (39) / `      NBZ=0` (40) / `      IF(ICPL.GT.0 .OR. ISTM.EQ.1) RETURN` (42) |
+| 44–96 | 시작 시 1행 루틴 안. 수를 센다는 주석이다(44). NUMB·비양수 지표 건너뛰기는 주석 처리된 이전 코드다(45–47). 실행은 NUMB0 범위를 순회하고 비양수 지표를 -IJK-1로 변환한다(48–55). NS·출력영역·해당 축의 시작·종료 지표가 서로 다른 조건에 따라 NBX·NBY·NBZ를 증가시킨다(56–86). 실행문 종료·종료부다(89–96). 원문: `CD    -- 数を数える --` (수를 셈) (44) / `CC      DO 100 L=1,NUMB` (45) / `CC        IJK=INDB(1,L)` (46) / `CC        IF (IJK.LE.0) GOTO 100` (47) / `      DO 100 L=1,NUMB0` (48) / `        IJK=INDB(1,L)` (49) / `        IF (IJK.LE.0) IJK=-IJK-1` (50) / `        NS =INDB(2,L)` (51) / `        K  =(IJK-1)/(NUMI*NUMJ)+1` (52) / `        IJK=IJK-NUMI*NUMJ*(K-1)` (53) / `        J  =(IJK-1)/NUMI+1` (54) / `        I  =IJK-NUMI*(J-1)` (55) / `        IF     (NS.EQ.1 .OR. NS.EQ.2) THEN` (56) / `          IF (I1.NE.I2) THEN` (57) / `            IF (I1.LE.I .AND. I.LE.IX) THEN` (58) / `              IF (J1.LE.J .AND. J.LE.J2) THEN` (59) / `                IF (K1.LE.K .AND. K.LE.K2) THEN` (60) / `                  NBX=NBX+1` (61) / `                ENDIF` (62) / `              ENDIF` (63) / `            ENDIF` (64) / `          ENDIF` (65) / `        ELSEIF (NS.EQ.3 .OR. NS.EQ.4) THEN` (66) / `          IF (J1.NE.J2) THEN` (67) / `            IF (I1.LE.I .AND. I.LE.I2) THEN` (68) / `              IF (J1.LE.J .AND. J.LE.JY) THEN` (69) / `                IF (K1.LE.K .AND. K.LE.K2) THEN` (70) / `                  NBY=NBY+1` (71) / `                ENDIF` (72) / `              ENDIF` (73) / `            ENDIF` (74) / `          ENDIF` (75) / `        ELSE` (76) / `          IF (K1.NE.K2) THEN` (77) / `            IF (I1.LE.I .AND. I.LE.I2) THEN` (78) / `              IF (J1.LE.J .AND. J.LE.J2) THEN` (79) / `                IF (K1.LE.K .AND. K.LE.KZ) THEN` (80) / `                  NBZ=NBZ+1` (81) / `                ENDIF` (82) / `              ENDIF` (83) / `            ENDIF` (84) / `          ENDIF` (85) / `        ENDIF` (86) / ` 100  CONTINUE` (87) / `C     -- 実行文の終了 --` (실행문 종료) (89) / `      GOTO 9999` (90) / `C==== 終了 ===========================================================` (종료) (92) / ` 9999 CONTINUE` (94) / `      RETURN` (95) / `      END` (96) [11-04 전수 검증 정정] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 42: ICPL>0 또는 ISTM=1이면 경계 수를 모두 0으로 반환한다.
+- 45–50: 실행 반복 범위는 NUMB0이다. 비양수 지표는 건너뛰지 않고 -IJK-1로 변환한다.

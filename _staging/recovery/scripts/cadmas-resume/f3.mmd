@@ -1,0 +1,68 @@
+flowchart TB
+ subgraph F["CADMAS-SURF-3D2F"]
+ c01["INIT_MPMD · VF_P0INIT · SF_COMM_INIT<br/>2F vf_a1main.f:276 · :282 · :299"]
+ c02["SF_STR0 (ICPL.GT.0) · SF_STR1 (ICPL.GT.0)<br/>2F vf_a1main.f:750 · :996"]
+ c03["SF_POS_INIT: 초기 압력·면 자료 송신과 POS 수신<br/>2F sf_str1.f:24 · sf_pos_init.f:30 · :56"]
+ c04["VF_PMGP2C · VF_PMGC2P · VF_CDTCAL<br/>2F vf_a1main.f:1023 · :1026 · :1041"]
+ c05["VF_OM1TRN · SF_STR3<br/>2F vf_a1main.f:1082 · :1097"]
+ c06["MPI_ALLREDUCE · MPI_SEND (IHIDEM.EQ.1.AND.MYRANK.EQ.0)<br/>2F vf_a1main.f:1113 · :1121"]
+ c07["VF_A1MAIN (IE.EQ.1 .OR. IEE.EQ.1) GOTO 1000<br/>2F vf_a1main.f:1124"]
+ c08["MPI_ALLREDUCE · SF_STR2 (ICPL.EQ.2)<br/>2F vf_a1main.f:1128 · :1141"]
+ c09["SF_POS_UPDATE1: 유체 압력 추출 (TNEXT > TSTR2)<br/>2F sf_str2.f:14 · sf_pos_update1.f:26"]
+ c10["SF_POS_UPDATE2: POS20 수신 (TNEXT > TSTR2)<br/>2F sf_str2.f:18 · sf_pos_update2.f:39"]
+ c11["SF_C_MPI_SEND_D/I: AFC·IPND·PRES0·TNEXT<br/>2F sf_pos_update2.f:43 · :44 · :46 · :47"]
+ c12["SF_C_MPI_RECV_D: TSTR2 · 위치 보간<br/>2F sf_pos_update2.f:49 · :85 · :92"]
+ c13["SF_STR_OBST · SF_BC_RESET · SF_CINIT<br/>2F sf_str2.f:24 · :33 · :39"]
+ c14["VF_JPHDM2 (IPRNT.GT.1 / ELSE of IHIDEM.EQ.0)<br/>2F vf_a1main.f:1153"]
+ c15["MPI_SEND: DT · 압력<br/>2F vf_jphdm2.f:98 · :133 · :178"]
+ c16["MPI_RECV: 체적·군속도<br/>2F vf_jphdm2.f:208"]
+ c17["VF_CGGVH (DO 600 ILOOP=1,LOOPS / IHIDEM.EQ.0의 ELSE)<br/>2F vf_a1main.f:1182 · :1203"]
+ c18["VF_V1EOS · VF_V1CAL (DO LL=1,MAXITR)<br/>2F vf_a1main.f:1347 · :1351 · :1373"]
+ c19["VF_A1MAIN (SERR.LE.SERROR) EXIT<br/>2F vf_a1main.f:1385"]
+ c20["VF_T1CAL · VF_S1CAL · VF_K1CAL · VF_F1CAL<br/>2F vf_a1main.f:1406 · :1415 · :1424 · :1433"]
+ c21["VF_A1MAIN: 경계 재설정 · GOTO 500<br/>2F vf_a1main.f:1448 · :1488"]
+ c22["VF_OM1TRN: iflag=-1 · VF_P1END<br/>2F vf_a1main.f:1492 · :1510"]
+ end
+ subgraph S["STR3D"]
+ s01["INIT_MPMD · C_MPI_INIT · ASTEA_MECHANICAL<br/>STR main/main.f:25 · :27 · :86 · :92"]
+ s02["SEND_CONT · RECV_SURF (ICPL == 2)<br/>STR main/astea_mechanical.f:69 · :72"]
+ s03["NL_STATIC_S · SEND_POS<br/>STR main/astea_mechanical.f:118 · seq/nl_static_s.f:1 · mpi_comm/send_pos.f:13"]
+ s04["NL_TRANSIENT_S (DO ISTEP = ISTART, NSTEP)<br/>STR seq/nl_transient_s.f:74"]
+ s05["RECV_PRES (ICPL == 2 .AND. ISEND == 1)<br/>STR seq/nl_transient_s.f:83 · mpi_comm/recv_pres.f:15"]
+ s06["C_MPI_SEND_D: TIM<br/>STR mpi_comm/recv_pres.f:40"]
+ s07["TLOADSET · PLD_CADMAS: 유체 하중<br/>STR seq/nl_transient_s.f:103 · src/pld_cadmas.f:46"]
+ s08["MPCCORR · NPFORCE_S · RESFRC · GLBSTF · MERGDU<br/>STR seq/nl_transient_s.f:127 · :146 · :158 · :173 · :202"]
+ s09["CONTACT / CONTACTP (I_BCT > 0)<br/>STR seq/nl_transient_s.f:223 · :231"]
+ s10["FEMAP_OUT · SEND_POS (ICPL == 2 .AND. ISTEP < NSTEP)<br/>STR seq/nl_transient_s.f:295 · :313"]
+ s11["MPI_FINALIZE<br/>STR main/main.f:104"]
+ end
+ subgraph A["AGENT"]
+ g01["INIT_MPMD · READ_CADMAS: iflag=0<br/>AG main.f90:17 · :51"]
+ g02["SOLVER · INITIALIZE · READ_CADMAS: iflag=1<br/>AG main.f90:61 · solver.f90:27 · :32"]
+ g03["SOLVER (do nstep=1,maxstep): time=time+dt<br/>AG solver.f90:66 · :68"]
+ g04["READ_CADMAS (do while(time>=region(m)%cadmas_tnext))<br/>AG solver.f90:70 · read_cadmas.f90:191"]
+ g05["MPI_IRECV · REMESH / 파일 READ · REMESH<br/>AG read_cadmas.f90:195 · :216 · :255 · :256"]
+ g06["UPDATE_RW (n_rw==1 .and. time>=rw_tnext)<br/>MAKE_POTENTIAL_MOB (n_mob==1)<br/>AG solver.f90:74 · :79"]
+ g07["MOVE_AGENT · UPDATE_ATTRIBUTE · OUTPUT<br/>AG solver.f90:83 · :86 · :89"]
+ g08["SOLVER (time.ge.time_end .or. time_end-time.lt.eps) exit<br/>AG solver.f90:97"]
+ g09["OUTPUT: iflag=2 · MPI_FINALIZE<br/>AG solver.f90:111 · main.f90:64"]
+ end
+ c01 --> c02 --> c03 --> c04 --> c05 --> c06 --> c07
+ c07 -->|"종료"| c22
+ c07 -->|"계산 계속"| c08 --> c09 --> c10 --> c11 --> c12 --> c13 --> c14 --> c15 --> c16 --> c17 --> c18 --> c19
+ c19 -->|"밀도 반복"| c18
+ c19 -->|"부분 반복 완료 뒤"| c20 --> c21 --> c04
+ s01 --> s02 --> s03 --> s04 --> s05 --> s06 --> s07 --> s08 --> s09 --> s10
+ s09 -->|"접촉 재판정"| s08
+ s10 -->|"다음 구조 시간 단계"| s04
+ s10 -->|"시간 반복 종료 뒤"| s11
+ c03 -.->|"초기 압력·면 자료"| s02
+ s03 -.->|"초기 POS"| c03
+ s10 -.->|"POS · VELE"| c10
+ c11 -.->|"AFC·IPND·PRESS·TNEXT"| s05
+ s06 -.->|"TSTR2"| c12
+ g01 --> g02 --> g03 --> g04 --> g05 --> g06 --> g07 --> g08
+ g08 -->|"시간 반복"| g03
+ g08 -->|"종료"| g09
+ c05 -.->|"수심·유량"| g05
+ c22 -.->|"음수 시각 종료 통지"| g04
