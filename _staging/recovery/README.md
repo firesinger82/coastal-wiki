@@ -46,7 +46,7 @@
 | SFINCS | 51 | 51 | 0 | 0 | PDF 1개 중 0 |
 | SWAN | 76 | 76 | 0 | 0 | PDF 9개 중 7 |
 | SWASH | 160 | 160 | 0 | 0 | PDF 2개 중 0 |
-| ShorelineS | 136 | 136 | 0 | 0 | PDF 6개 중 2 |
+| ShorelineS | 136 | 136 | 0 | 0 | PDF 6개 중 2 (10-02 기준). 10-12 판독 후: 현재 `doc/`의 PDF 4개 모두 판독(111쪽, 아래 "ShorelineS 판독") |
 | XBeach | 83 | 83 | 0 | 0 | 별도 감사(`model-audit/XBeach`)에서 1회 판독, 수식·그림 9경로 미판독 |
 
 - **매뉴얼 PDF는 전수 판독에서 사실상 읽히지 않았다.** total-read의 PDF 기록 250개 중 판독 완료는 SWAN 7·ShorelineS 2·ADCIRC 1뿐이고 나머지는 기계 sweep 실패다. 위 "매뉴얼·문서 LLM판독" 숫자 대부분은 웹 문서 사본(HTML·md)이다. PDF 내용은 1차 노트(`manual-notes/`)에 페이지 인용으로 일부만 들어가 있다.
